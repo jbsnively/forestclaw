@@ -67,7 +67,7 @@ c     # that doesn't pass the coarsening test.
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
             exceeds_th = fclaw2d_clawpatch46_exceeds_th(
-     &             q(i,j,mq),qmin,qmax,coarsen_threshold)
+     &             qmax-qmin,qmin,qmax,coarsen_threshold)
             if (exceeds_th) then
                tag_patch = 0
                return
