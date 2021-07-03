@@ -52,10 +52,10 @@
      &      blockno,mpirank)
 
 
-      if (meqn .gt. 5) then
+      if (meqn .gt. 10) then
          write(6,'(A,A,A,I5,A)')     
      &         'Warning (fclaw2d_fort_write_grid_header.f) ',
-     &         ': meqn > 5; change format statement 120.', 
+     &         ': meqn > 10; change format statement 120.', 
      &         '(meqn = ',meqn,')'
          stop
       endif
@@ -71,8 +71,8 @@
          enddo
          write(matunit1,*) ' '
       enddo
-c     # This statement is checked above (meqn <= 5)
-  120 format (5E26.16)
+c     # This statement is checked above (meqn <= 10)
+  120 format (10E26.16)
 
       close(matunit1)
 

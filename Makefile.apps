@@ -45,6 +45,23 @@ include applications/elliptic/elliptic.apps
 endif
 
 
+# --------------------------------------------
+# Clawpack 4.6 and 5.0 libraries and examples
+# --------------------------------------------
+
+if FCLAW_ENABLE_MAGIC
+
+## Patches needed for Clawpack solvers
+include src/patches/clawpatch/Makefile.am
+
+## Solver libraries (most example apps require both)
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
+
+## examples
+include MAGIC-Forest/Makefile.am
+
+endif
 
 
 # ----------------------------------
