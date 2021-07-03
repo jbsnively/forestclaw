@@ -26,7 +26,7 @@ c     # Refine based only on first variable in system.
             qmin = min(q(i,j,mq),qmin)
             qmax = max(q(i,j,mq),qmax)
             exceeds_th = fclaw2d_clawpatch46_exceeds_th(
-     &             q(i,j,mq),qmin,qmax,tag_threshold)
+     &             qmax-qmin,qmin,qmax,tag_threshold)
             if (exceeds_th) then
 c              # Refine this patch               
                tag_patch = 1

@@ -31,6 +31,9 @@ FCLAW_ARG_ENABLE([geoclaw], [Enable geoclaw library and applications],
 FCLAW_ARG_ENABLE([ash3d], [enable ash3d library and applications],
                  [ASH3D])
 
+FCLAW_ARG_ENABLE([magic], [Enable clawpack libraries 4.6 and 5.0 and magic],
+                 [MAGIC])
+
 FCLAW_ARG_ENABLE([clawpack], [Enable clawpack libraries 4.6 and 5.0 and applications],
                  [CLAWPACK])
 
