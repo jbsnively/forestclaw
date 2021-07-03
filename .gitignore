@@ -1043,3 +1043,8 @@ src/solvers/fc2d_clawpack5/libclawpack5_la-fc2d_clawpack5.lo
 src/solvers/fc2d_clawpack5/libclawpack5_la-fc2d_clawpack5.o
 src/solvers/fc2d_clawpack5/libclawpack5_la-fc2d_clawpack5_options.lo
 src/solvers/fc2d_clawpack5/libclawpack5_la-fc2d_clawpack5_options.o
+applications/lowlevel/.deps/.dirstamp
+applications/lowlevel/.dirstamp
+applications/lowlevel/smooth
+applications/lowlevel/smooth.o
+Makefile.fclaw.mk
