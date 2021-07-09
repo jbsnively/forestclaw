@@ -16,10 +16,10 @@
       double precision qmin, qmax
 
 c     # Don't coarsen when initializing the mesh
-      if (initflag .ne. 0) then
-           tag_patch = 0
-           return
-      endif
+c      if (initflag .ne. 0) then
+c           tag_patch = 0
+c           return
+c      endif
 
 c     # Assume that we will coarsen a family unless we find a grid
 c     # that doesn't pass the coarsening test.
