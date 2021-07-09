@@ -1065,3 +1065,5 @@ ChangeLog
 src/pre_config.h.in~
 *.4
 *.o
+cmake/.DS_Store
+.DS_Store
