@@ -104,6 +104,18 @@ void CLAWPACK46_RPT2(const int* ixy, const int* maxm, const int* meqn, const int
                      double aux1[], double aux2[], double aux3[], const int* imp,
                      double dsdq[], double bmasdq[], double bpasdq[]);
 
+#define CLAWPACK46_RPN2FW    FCLAW_F77_FUNC(clawpack46_rpn2fw,   CLAWPACK46_RPN2FW)
+void CLAWPACK46_RPN2FW(const int* ixy,const int* maxm, const int* meqn, const int* mwaves,
+                     const int* mbc,const int* mx, double ql[], double qr[],
+                     double auxl[], double auxr[], double wave[],
+                     double s[], double amdq[], double apdq[], const int* maux);
+
+#define CLAWPACK46_RPT2FW    FCLAW_F77_FUNC(clawpack46_rpt2fw,   CLAWPACK46_RPT2FW)
+void CLAWPACK46_RPT2FW(const int* ixy, const int* maxm, const int* meqn, const int* mwaves,
+                     const int* maux, const int* mbc, const int* mx, double ql[], double qr[],
+                     double aux1[], double aux2[], double aux3[], const int* imp,
+                     double dsdq[], double bmasdq[], double bpasdq[]);
+
 
 
 /* These should actually be called CLAWPATCH46_TAG4REFINEMENT,  
