@@ -1067,3 +1067,4 @@ src/pre_config.h.in~
 *.o
 cmake/.DS_Store
 .DS_Store
+*.5
