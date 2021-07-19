@@ -6,6 +6,7 @@ export FCLAW_BIN=$FCLAW/local/bin
     --enable-mpi \
     --enable-clawpack \
     --enable-magic \
+    --enable-clawpack3 \
     --disable-shared \
     --without-blas \
     F77="mpif77" \
