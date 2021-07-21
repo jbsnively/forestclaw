@@ -1,7 +1,7 @@
 subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
       method, mthlim, mcapa, mwaves, mx, my, mz, qold, aux, &
       dx, dy, dz, dt,cfl, work, mwork,xlower,ylower,zlower, &
-      level, t, fp,fm, gp, gm, hm, hp, rpn3, rpt3, rptt3, &
+      level, t, fp,fm, gp, gm, hp, hm, rpn3, rpt3, rptt3, &
       use_fwaves, ierror)
 
     implicit none
@@ -19,20 +19,18 @@ subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
     DOUBLE PRECISION :: qold(1-mbc:mx+mbc, 1-mbc:my+mbc, 1-mbc:mz+mbc,meqn)
     DOUBLE PRECISION ::  aux(1-mbc:mx+mbc, 1-mbc:my+mbc, 1-mbc:mz+mbc,maux)
 
-    DOUBLE PRECISION :: fp(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
-    DOUBLE PRECISION :: fm(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
-    DOUBLE PRECISION :: gp(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
-    DOUBLE PRECISION :: gm(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
-    DOUBLE PRECISION :: hp(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
-    DOUBLE PRECISION :: hm(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    DOUBLE PRECISION :: fp(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
+    DOUBLE PRECISION :: fm(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
+    DOUBLE PRECISION :: gp(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
+    DOUBLE PRECISION :: gm(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
+    DOUBLE PRECISION :: hp(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
+    DOUBLE PRECISION :: hm(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
 
 
     !!  # Local variables
     integer :: i0faddm, i0faddp, i0gadd, i0hadd
     integer :: i0q1d, i0dtdx1, i0dtdy1, i0dtdz1
     integer :: i0aux1, i0aux2, i0aux3, i0next, mused, mwork1
-    integer :: i0wave, i0s, i0amdq, i0apdq, i0ql, i0qr
-    integer :: i0auxl, i0auxr
 
     double precision :: dtdx, dtdy, dtdz
     integer :: i,j,k, m
@@ -78,7 +76,6 @@ subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
        return
     endif
 
-
     !! # Include four additional arguments to avoid need for
     !! # global array
 
@@ -103,15 +100,15 @@ subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
                     if (mcapa .eq. 0) then
                         !! # no capa array.  Standard flux differencing:
                         qold(i,j,k, m) = qold(i,j,k,m) &
-                            - dtdx * (fm(i+1,j,k,m) - fp(i,j,k,m))  &
-                            - dtdy * (gm(i,j+1,k,m) - gp(i,j,k,m))  & 
-                            - dtdz * (hm(i,j+1,k,m) - hp(i,j,k,m))
+                            - dtdx * (fm(m,i+1,j,k) - fp(m,i,j,k))  &
+                            - dtdy * (gm(m,i,j+1,k) - gp(m,i,j,k))  & 
+                            - dtdz * (hm(m,i,j+1,k) - hp(m,i,j,k))
                     else
                         !! # with capa array.
                         qold(i,j,k, m) = qold(i,j,k, m) & 
-                             -(dtdx*(fm(i+1,j,k,m) - fp(i,j,k,m)) &
-                             + dtdy*(gm(i,j+1,k,m) - gp(i,j,k,m)) &
-                             + dtdz*(hm(i,j+1,k,m) - hp(i,j,k,m)))/aux(i,j,k,mcapa)
+                             -(dtdx*(fm(m,i+1,j,k) - fp(m,i,j,k)) &
+                             + dtdy*(gm(m,i,j+1,k) - gp(m,i,j,k)) &
+                             + dtdz*(hm(m,i,j+1,k) - hp(m,i,j,k)))/aux(i,j,k,mcapa)
                     endif
                 enddo
             enddo
