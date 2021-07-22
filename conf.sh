@@ -4,8 +4,6 @@ export FCLAW_BIN=$FCLAW/local/bin
 
 ./configure \
     --enable-mpi \
-    --enable-clawpack \
-    --enable-magic \
     --enable-clawpack3 \
     --disable-shared \
     --without-blas \
@@ -16,5 +14,7 @@ export FCLAW_BIN=$FCLAW/local/bin
     CXXFLAGS="-O3 -Wall -DFCLAW2D_PATCHDIM=3 -DFCLAW2D_REFINEDIM=2" \
     FFLAGS="-fast -assume buffered_io" 
 #    LIBS="-lmkl_intel_lp64 -lmkl_core -lmkl_sequential"
+#    --enable-clawpack \
+#    --enable-magic \
 
 
