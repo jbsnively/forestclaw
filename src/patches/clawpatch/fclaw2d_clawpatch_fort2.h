@@ -107,15 +107,13 @@ typedef void (*clawpatch_fort_tag4refinement_t)(const int* mx,const int* my,
 
 typedef void (*clawpatch_fort_tag4coarsening_t)(const int* mx, const int* my,
 												const int* mbc, const int* meqn,
-												double xlower[], 
-                                                double ylower[],
+												double xlower[], double ylower[],
 												const double* dx, const double* dy,
 												const int* blockno,
 												double q0[],double q1[],
 												double q2[],double q3[],
 												const double* tag_threshold,
-                                                const int* init_flag,
-												int* tag_patch);
+                                            							const int* init_flag, int* tag_patch);
 
 
 #if 0
@@ -217,15 +215,14 @@ void TAG4REFINEMENT(const int* mx,const int* my,
 
 #define TAG4COARSENING FCLAW_F77_FUNC(tag4coarsening,TAG4COARSENING)
 void TAG4COARSENING(const int* mx, const int* my,
-					const int* mbc, const int* meqn,
-					const double* xlower, const double* ylower,
-					const double* dx, const double* dy,
-					const int* blockno,
-					double q0[],double q1[],
-					double q2[],double q3[],
-					const double* tag_threshold,
-                    const int* initflag,
-					int* tag_patch);
+                                        const int* mbc, const int* meqn,
+                                        double xlower[], double ylower[],
+                                        const double* dx, const double* dy,
+                                        const int* blockno,
+                                        double q0[],double q1[],
+                                        double q2[],double q3[],
+                                        const double* tag_threshold,
+                                        const int* init_flag, int* tag_patch);
 
 
 /* ----------------------------- interpolation/coarsening ----------------------------- */
