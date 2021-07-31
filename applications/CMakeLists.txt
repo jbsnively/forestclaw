@@ -102,6 +102,8 @@ endif()
 ##include src/solvers/fc3d_ash3d/test_cases/ash3d.apps
 #
 #endif
+
+
 #
 ## ----------------------------------------
 ## ACTIVEFLUX project (requires submodule)
@@ -125,16 +127,16 @@ endif()
 # ----------------------------------
 if(TARGET FORESTCLAW::CUDACLAW)
 
-    include(cudaclaw.cmake)
+    include(cudaclaw/cudaclaw.cmake)
 
 endif()
 
 # ----------------------------------
 # clawpack3 library and examples
 # ----------------------------------
-if(TARGET FORESTCLAW::CLAWPACK3)
+if(TARGET FORESTCLAW::CLAWPACK3_46)
 
-    include(claw3.cmake)
+    include(clawpack/claw3.cmake)
 
 endif()
 

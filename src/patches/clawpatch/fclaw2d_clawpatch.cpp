@@ -728,7 +728,6 @@ int clawpatch_tag4coarsening(fclaw2d_global_t *glob,
 							 int patchno,
 							 int initflag)
 {
-
 #if FCLAW2D_REFINEDIM == 3
 	fclaw_global_essentialf("tag4coarsening : Not implemented for full 3d " \
 	                        "refinement.\n");
@@ -1002,8 +1001,6 @@ void clawpatch_ghost_comm(fclaw2d_global_t* glob,
 	{
 		FCLAW_ASSERT(extrasize > 0);
 		FCLAW_ASSERT(clawpatch_vt->local_ghost_pack_aux != NULL);
-		/* This should be renamed, since it doesn't point to an actual
-		   Fortran routine (or one with a fortran like signature) */
 		clawpatch_vt->local_ghost_pack_aux(glob,patch,mint,
 		                                   qpack,extrasize,
 		                                   packmode,&ierror);
@@ -1545,6 +1542,11 @@ size_t fclaw2d_clawpatch_size(fclaw2d_global_t *glob)
 	int meqn = clawpatch_opt->meqn;
 	int mbc = clawpatch_opt->mbc;
 	size_t size = (mx+2*mbc)*(my+2*mbc)*meqn;
+
+#if FCLAW2D_PATCHDIM == 3
+	int mz = clawpatch_opt->mz;
+	size *= (mz + 2*mbc);
+#endif
 
 	return size;
 }

@@ -26,14 +26,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef FCLAW2D_CLAWPATCH5_FORT_H
 #define FCLAW2D_CLAWPATCH5_FORT_H
 
-#ifdef __cplusplus
-extern "C"
-{
-#if 0
-}
-#endif
-#endif
-
 
 #if FCLAW2D_PATCHDIM == 2
 #include "fclaw2d_clawpatch5_fort2.h"
@@ -44,9 +36,18 @@ extern "C"
 
 
 #ifdef __cplusplus
-#if 0
+extern "C"
 {
 #endif
+
+#if 0
+/* Fix syntax highlighting */
+#endif
+
+/* No clawpatch5 dimensional independent code */
+
+
+#ifdef __cplusplus
 }
 #endif
 

@@ -48,6 +48,11 @@ struct fclaw2d_patch_transform_data;  /* Should be replaced by long int?  */
 /* Functions defined here are implemented in individual solvers (clawpack 4.6 and 
    clawpack 5.0) */
 
+#if 0
+/* Fix syntax highlighting */
+#endif
+
+
 /* --------------------- Dimension independent defs and routines ---------------------- */
 
 /* These headers are independent of dimension and clawpack version */
@@ -170,6 +175,24 @@ int FCLAW2D_CLAWPATCH_GRADIENT_EXCEEDS_TH(const int *blockno,
                                           const int *init_flag,
                                           const int *is_ghost);
 
+
+/* ------------------------------- user threshold --------------------------------- */
+#define USER_EXCEEDS_TH \
+                  FCLAW_F77_FUNC(user_exceeds_th, \
+                                 USER_EXCEEDS_TH)
+
+int USER_EXCEEDS_TH(const int *blockno,
+                    const double *qval, 
+                    const double* qmin, 
+                    const double *qmax,
+                    const double quad[], 
+                    const double *dx, 
+                    const double *dy, 
+                    const double *xc, 
+                    const double *yc, 
+                    const double *tag_threshold,
+                    const int *init_flag,
+                    const int *is_ghost);
 
     
 #ifdef __cplusplus

@@ -35,4 +35,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
+#if 0
+/* Fix syntax highlighting */
+#endif
+
+/* No clawpatch46 dimensional independent code */
+
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

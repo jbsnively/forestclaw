@@ -18,8 +18,8 @@ c     # ---------------------------------------------------------------
 
 
       double precision q0, r0, r
-      double precision theta, th, thc(2)
-      double precision phi, l, lc(2)
+      double precision theta, th, thc(2), lc(2)
+      double precision phi, l
       double precision c,b,cbell, hi, hmax, rarg
       double precision Hsmooth
       integer k
@@ -73,8 +73,8 @@ c         # Cosine Bells
               thc(1) = 0
               thc(2) = 0
           else
-              write(6,*) 'q0.f : example is not valid; example = ', 
-     &             example
+              write(6,*) 'q0 : example must be 1,2 or 3'
+              stop
           endif
 
           cbell = b
@@ -93,11 +93,9 @@ c         # Cosine Bells
               endif
           end do
           q0 = cbell
-
       else
-          write(6,'(A,A,I5)') 'q0_physical : Initchoice is not set to ',
-     &                'valid value; initchoice =  ', initchoice
-          stop
+          write(6,*) 'q0.f  : initchoice must be 1,2 or 3'
+          stop          
       endif
       q0_physical = q0
 

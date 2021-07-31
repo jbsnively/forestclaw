@@ -25,39 +25,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "swirl_user.h"
 
-static
-void swirl_problem_setup(fclaw2d_global_t* glob)
-{
-#if 0
-    const user_options_t* user = swirl_get_options(glob);
-
-    if (glob->mpirank == 0)
-    {
-        FILE *f = fopen("setprob.data","w");
-        fprintf(f,"%-24.4f %s\n",user->period,"\% period");
-        fclose(f);
-    }
-#endif    
-
-    /* Make sure node 0 has written 'setprob.data' before proceeding */
-    fclaw2d_domain_barrier (glob->domain);
-
-    SETPROB();
-}
-
 void swirl_link_solvers(fclaw2d_global_t *glob)
 {
-    fclaw2d_vtable_t *vt = fclaw2d_vt();
-    vt->problem_setup = &swirl_problem_setup;  /* Version-independent */
-
+    /* example of how to set up a user defined criteria */
     fclaw2d_clawpatch_vtable_t *clawpatch_vt = fclaw2d_clawpatch_vt();
-    clawpatch_vt->fort_user_exceeds_threshold = &USER_EXCEEDS_THRESHOLD;
+    clawpatch_vt->fort_user_exceeds_threshold = &USER_EXCEEDS_TH;
 
     const user_options_t* user = swirl_get_options(glob);
     if (user->claw_version == 4)
     {
         fc3d_clawpack46_vtable_t *clawpack46_vt = fc3d_clawpack46_vt();        
 
+        clawpack46_vt->fort_setprob   = &SETPROB;
         clawpack46_vt->fort_qinit     = &CLAWPACK46_QINIT;
         clawpack46_vt->fort_setaux    = &CLAWPACK46_SETAUX;
         clawpack46_vt->fort_rpn3      = &CLAWPACK46_RPN3;
@@ -67,7 +46,7 @@ void swirl_link_solvers(fclaw2d_global_t *glob)
     }
     else if (user->claw_version == 5)
     {
-        printf("swirl_user.cpp : Example not implemented  for Claw version 5.\n");
+        printf("swirl_user.cpp : Example not implemented for Claw version 5.\n");
         exit(0);
     }
 }
