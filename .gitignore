@@ -1162,3 +1162,8 @@ src/solvers/fc2d_clawpack5/.deps/libclawpack5_la-fc2d_clawpack5.Tpo
 applications/clawpack/transport/2d/sphere/sphere_transport
 applications/clawpack/transport/2d/torus/torus_transport
 *.6
+applications/clawpack/advection/3d/filament/.deps/.dirstamp
+applications/clawpack/advection/3d/filament/.dirstamp
+applications/clawpack/advection/3d/filament/filament
+applications/clawpack/advection/3d/swirl/brick.dat
+applications/clawpack/advection/3d/swirl/fort_frame_0000.vtu
