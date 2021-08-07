@@ -57,7 +57,7 @@ void CLAWPACK46_QINIT(const int* meqn, const int* mbc,
                       const double* zlower, 
                       const double* dx, const double* dy, const double *dz,
                       double q[], const int* maux, double aux[]);
-  
+
 #define CLAWPACK46_SETAUX  FCLAW_F77_FUNC(clawpack46_setaux, CLAWPACK46_SETAUX)
 void CLAWPACK46_SETAUX(const int* mbc, const int* mx, const int* my, const int* mz, 
                        const double* xlower, const double* ylower, const double* zlower,
