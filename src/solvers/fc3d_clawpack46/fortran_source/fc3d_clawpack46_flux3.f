@@ -179,9 +179,9 @@ c
 c
       logical limit
 
-c      double precision dtcom, dxcom, dycom, dzcom, tcom
-c      integer icom,jcom,kcom
-c      common/comxyzt/dtcom,dxcom,dycom,dzcom,tcom,icom,jcom,kcom
+      double precision dtcom, dxcom, dycom, dzcom, tcom
+      integer icom,jcom,kcom
+      common /comxyzt/ dtcom,dxcom,dycom,dzcom,tcom,icom,jcom,kcom
 
       integer mw, m, i,m3, m4
       double precision dtdxave

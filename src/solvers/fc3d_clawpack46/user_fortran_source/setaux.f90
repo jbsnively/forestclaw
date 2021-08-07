@@ -1,4 +1,4 @@
-subroutine clawpack46)setaux(mbc,mx,my,mz,xlower,ylower,zlower, & 
+subroutine clawpack46_setaux(mbc,mx,my,mz,xlower,ylower,zlower, & 
     dx,dy,dz,maux,aux)
 
     !! Called at start of computation before calling qinit, and
