@@ -153,7 +153,7 @@ typedef void (*clawpack46_fort_flux3_t)(const int* ixyz,const int* maxm, const i
         clawpack46_fort_rpt3_t  rpt3, 
         clawpack46_fort_rptt3_t rptt3,
         const int* mwaves, const int* mcapa,
-        int method[], int mthlim[]);
+        int method[], int mthlim[], const int* use_fwaves);
 
 typedef void (*clawpack46_fort_rpn3_cons_t)(const int* meqn, const int* maux, 
 											const int *idir, const int* iface, 
