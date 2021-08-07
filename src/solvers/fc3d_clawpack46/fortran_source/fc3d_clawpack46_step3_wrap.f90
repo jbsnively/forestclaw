@@ -19,12 +19,12 @@ subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
     DOUBLE PRECISION :: qold(1-mbc:mx+mbc, 1-mbc:my+mbc, 1-mbc:mz+mbc,meqn)
     DOUBLE PRECISION ::  aux(1-mbc:mx+mbc, 1-mbc:my+mbc, 1-mbc:mz+mbc,maux)
 
-    DOUBLE PRECISION :: fp(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
-    DOUBLE PRECISION :: fm(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
-    DOUBLE PRECISION :: gp(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
-    DOUBLE PRECISION :: gm(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
-    DOUBLE PRECISION :: hp(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
-    DOUBLE PRECISION :: hm(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
+    DOUBLE PRECISION :: fp(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    DOUBLE PRECISION :: fm(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    DOUBLE PRECISION :: gp(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    DOUBLE PRECISION :: gm(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    DOUBLE PRECISION :: hp(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    DOUBLE PRECISION :: hm(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
 
     !!  # Local variables
@@ -99,16 +99,16 @@ subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
                 do k = 1,mz
                     if (mcapa .eq. 0) then
                         !! # no capa array.  Standard flux differencing:
-                        qold(i,j,k, m) = qold(i,j,k,m) &
-                            - dtdx * (fm(m,i+1,j,k) - fp(m,i,j,k))  &
-                            - dtdy * (gm(m,i,j+1,k) - gp(m,i,j,k))  & 
-                            - dtdz * (hm(m,i,j,k+1) - hp(m,i,j,k))
+                        qold(i,j,k,m) = qold(i,j,k,m) &
+                            - dtdx * (fm(i+1,j,k,m) - fp(i,j,k,m))  &
+                            - dtdy * (gm(i,j+1,k,m) - gp(i,j,k,m))  & 
+                            - dtdz * (hm(i,j,k+1,m) - hp(i,j,k,m))
                     else
                         !! # with capa array.
-                        qold(i,j,k, m) = qold(i,j,k, m) & 
-                             -(dtdx*(fm(m,i+1,j,k) - fp(m,i,j,k)) &
-                             + dtdy*(gm(m,i,j+1,k) - gp(m,i,j,k)) &
-                             + dtdz*(hm(m,i,j,k+1) - hp(m,i,j,k)))/aux(i,j,k,mcapa)
+                        qold(i,j,k,m) = qold(i,j,k,m) & 
+                             -(dtdx*(fm(i+1,j,k,m) - fp(i,j,k,m)) &
+                             + dtdy*(gm(i,j+1,k,m) - gp(i,j,k,m)) &
+                             + dtdz*(hm(i,j,k+1,m) - hp(i,j,k,m)))/aux(i,j,k,mcapa)
                     endif
                 enddo
             enddo

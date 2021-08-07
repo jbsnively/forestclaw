@@ -30,26 +30,26 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
     double precision :: dx,dy,dz,dt,cflgrid
 
     !! Claw 4 indexing
-    double precision :: qold(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision :: qold(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc, meqn)
     double precision :: aux(1-mbc:mx+mbc, 1-mbc:my+mbc,1-mbc:mz+mbc, maux)
 
     !! Claw 5 indexing
-    double precision :: q1d(meqn,1-mbc:maxm+mbc)
-    double precision ::  fm(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
-    double precision ::  fp(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
-    double precision ::  gm(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
-    double precision ::  gp(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
-    double precision ::  hm(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
-    double precision ::  hp(meqn,1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc)
+    double precision :: q1d(1-mbc:maxm+mbc,meqn)
+    double precision ::  fm(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision ::  fp(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision ::  gm(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision ::  gp(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision ::  hm(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
+    double precision ::  hp(1-mbc:mx+mbc,1-mbc:my+mbc,1-mbc:mz+mbc,meqn)
 
-    double precision :: faddm(meqn,1-mbc:maxm+mbc)
-    double precision :: faddp(meqn,1-mbc:maxm+mbc)
-    double precision ::  gadd(meqn,1-mbc:maxm+mbc, 2, -1:1)
-    double precision ::  hadd(meqn,1-mbc:maxm+mbc, 2, -1:1)
+    double precision :: faddm(1-mbc:maxm+mbc,meqn)
+    double precision :: faddp(1-mbc:maxm+mbc,meqn)
+    double precision ::  gadd(1-mbc:maxm+mbc,meqn, 2, -1:1)
+    double precision ::  hadd(1-mbc:maxm+mbc,meqn, 2, -1:1)
 
-    double precision :: aux1(maux,1-mbc:maxm+mbc, 3)
-    double precision :: aux2(maux,1-mbc:maxm+mbc, 3)
-    double precision :: aux3(maux,1-mbc:maxm+mbc, 3)
+    double precision :: aux1(1-mbc:maxm+mbc,maux, 3)
+    double precision :: aux2(1-mbc:maxm+mbc,maux, 3)
+    double precision :: aux3(1-mbc:maxm+mbc,maux, 3)
     double precision :: dtdx1d(1-mbc:maxm+mbc)
     double precision :: dtdy1d(1-mbc:maxm+mbc)
     double precision :: dtdz1d(1-mbc:maxm+mbc)
@@ -142,15 +142,15 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
     dtdz = dt/dz
 
     do m = 1,meqn
-        do i = 1-mbc,mx+mbc
+       do k = 1-mbc,mz+mbc
           do j = 1-mbc,my+mbc
-            do k = 1-mbc,mz+mbc
-                fm(m,i,j,k) = 0.d0
-                fp(m,i,j,k) = 0.d0
-                gm(m,i,j,k) = 0.d0
-                gp(m,i,j,k) = 0.d0
-                hm(m,i,j,k) = 0.d0
-                hp(m,i,j,k) = 0.d0
+             do i = 1-mbc,mx+mbc
+                fm(i,j,k,m) = 0.d0
+                fp(i,j,k,m) = 0.d0
+                gm(i,j,k,m) = 0.d0
+                gp(i,j,k,m) = 0.d0
+                hm(i,j,k,m) = 0.d0
+                hp(i,j,k,m) = 0.d0
              end do
           end do
        end do
@@ -169,10 +169,11 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
     !!  # perform x-sweeps
     !!  ==================
 
+
     kx_loop : do k = 0,mz+1
         jx_loop : do j = 0,my+1
-            do m = 1,meqn
-                do i = 1-mbc, mx+mbc
+            do i = 1-mbc, mx+mbc 
+                do m = 1,meqn
                     !! # copy data along a slice into 1d array:
                     q1d(m,i) = qold(i,j,k,m)
                 end do
@@ -185,8 +186,8 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
             endif
 
             if (maux .gt. 0)  then
-                do ma = 1,maux
-                    do i = 1-mbc, mx+mbc
+                 do i = 1-mbc, mx+mbc
+                    do ma = 1,maux
                         aux1(ma,i,1) = aux(i,j-1,k-1,ma)
                         aux1(ma,i,2) = aux(i,j-1,k,ma)
                         aux1(ma,i,3) = aux(i,j-1,k+1,ma)
@@ -237,38 +238,38 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
 
             !! # update fluxes for use in AMR:
 
-            do m = 1,meqn
-                do i = 1,mx+1
-                    fm(m,i,j,k) = fm(m,i,j,k) + faddm(m,i)
-                    fp(m,i,j,k) = fp(m,i,j,k) + faddp(m,i)
+             do i = 1,mx+1
+                do m = 1,meqn
+                    fm(i,j,k,m) = fm(i,j,k,m) + faddm(m,i)
+                    fp(i,j,k,m) = fp(i,j,k,m) + faddp(m,i)
 
-                    gm(m,i,j  ,k-1) = gm(m,i,j  ,k-1) + gadd(m,i,1,-1)
-                    gp(m,i,j  ,k-1) = gp(m,i,j  ,k-1) + gadd(m,i,1,-1)
-                    gm(m,i,j  ,k  ) = gm(m,i,j  ,k  ) + gadd(m,i,1, 0)
-                    gp(m,i,j  ,k  ) = gp(m,i,j  ,k  ) + gadd(m,i,1, 0)
-                    gm(m,i,j  ,k+1) = gm(m,i,j  ,k+1) + gadd(m,i,1, 1)
-                    gp(m,i,j  ,k+1) = gp(m,i,j  ,k+1) + gadd(m,i,1, 1)
+                    gm(i,j  ,k-1,m) = gm(i,j  ,k-1,m) + gadd(i,m,1,-1)
+                    gp(i,j  ,k-1,m) = gp(i,j  ,k-1,m) + gadd(i,m,1,-1)
+                    gm(i,j  ,k  ,m) = gm(i,j  ,k  ,m) + gadd(i,m,1, 0)
+                    gp(i,j  ,k  ,m) = gp(i,j  ,k  ,m) + gadd(i,m,1, 0)
+                    gm(i,j  ,k+1,m) = gm(i,j  ,k+1,m) + gadd(i,m,1, 1)
+                    gp(i,j  ,k+1,m) = gp(i,j  ,k+1,m) + gadd(i,m,1, 1)
 
-                    gm(m,i,j+1,k-1) = gm(m,i,j+1,k-1) + gadd(m,i,2,-1)
-                    gp(m,i,j+1,k-1) = gp(m,i,j+1,k-1) + gadd(m,i,2,-1)
-                    gm(m,i,j+1,k  ) = gm(m,i,j+1,k  ) + gadd(m,i,2, 0)
-                    gp(m,i,j+1,k  ) = gp(m,i,j+1,k  ) + gadd(m,i,2, 0)
-                    gm(m,i,j+1,k+1) = gm(m,i,j+1,k+1) + gadd(m,i,2, 1)
-                    gp(m,i,j+1,k+1) = gp(m,i,j+1,k+1) + gadd(m,i,2, 1)
+                    gm(i,j+1,k-1,m) = gm(i,j+1,k-1,m) + gadd(i,m,2,-1)
+                    gp(i,j+1,k-1,m) = gp(i,j+1,k-1,m) + gadd(i,m,2,-1)
+                    gm(i,j+1,k  ,m) = gm(i,j+1,k  ,m) + gadd(i,m,2, 0)
+                    gp(i,j+1,k  ,m) = gp(i,j+1,k  ,m) + gadd(i,m,2, 0)
+                    gm(i,j+1,k+1,m) = gm(i,j+1,k+1,m) + gadd(i,m,2, 1)
+                    gp(i,j+1,k+1,m) = gp(i,j+1,k+1,m) + gadd(i,m,2, 1)
 
-                    hm(m,i,j-1,k) = hm(m,i,j-1,k) + hadd(m,i,1,-1)
-                    hp(m,i,j-1,k) = hp(m,i,j-1,k) + hadd(m,i,1,-1)
-                    hm(m,i,j  ,k) = hm(m,i,j,  k) + hadd(m,i,1, 0)
-                    hp(m,i,j  ,k) = hp(m,i,j,  k) + hadd(m,i,1, 0)
-                    hm(m,i,j+1,k) = hm(m,i,j+1,k) + hadd(m,i,1, 1)
-                    hp(m,i,j+1,k) = hp(m,i,j+1,k) + hadd(m,i,1, 1)
+                    hm(i,j-1,k,m) = hm(i,j-1,k,m) + hadd(i,m,1,-1)
+                    hp(i,j-1,k,m) = hp(i,j-1,k,m) + hadd(i,m,1,-1)
+                    hm(i,j  ,k,m) = hm(i,j,  k,m) + hadd(i,m,1, 0)
+                    hp(i,j  ,k,m) = hp(i,j,  k,m) + hadd(i,m,1, 0)
+                    hm(i,j+1,k,m) = hm(i,j+1,k,m) + hadd(i,m,1, 1)
+                    hp(i,j+1,k,m) = hp(i,j+1,k,m) + hadd(i,m,1, 1)
 
-                    hm(m,i,j-1,k+1) = hm(m,i,j-1,k+1) + hadd(m,i,2,-1)
-                    hp(m,i,j-1,k+1) = hp(m,i,j-1,k+1) + hadd(m,i,2,-1)
-                    hm(m,i,j  ,k+1) = hm(m,i,j,  k+1) + hadd(m,i,2, 0)
-                    hp(m,i,j  ,k+1) = hp(m,i,j,  k+1) + hadd(m,i,2, 0)
-                    hm(m,i,j+1,k+1) = hm(m,i,j+1,k+1) + hadd(m,i,2, 1)
-                    hp(m,i,j+1,k+1) = hp(m,i,j+1,k+1) + hadd(m,i,2, 1)
+                    hm(i,j-1,k+1,m) = hm(i,j-1,k+1,m) + hadd(i,m,2,-1)
+                    hp(i,j-1,k+1,m) = hp(i,j-1,k+1,m) + hadd(i,m,2,-1)
+                    hm(i,j  ,k+1,m) = hm(i,j,  k+1,m) + hadd(i,m,2, 0)
+                    hp(i,j  ,k+1,m) = hp(i,j,  k+1,m) + hadd(i,m,2, 0)
+                    hm(i,j+1,k+1,m) = hm(i,j+1,k+1,m) + hadd(i,m,2, 1)
+                    hp(i,j+1,k+1,m) = hp(i,j+1,k+1,m) + hadd(i,m,2, 1)
                 end do
             end do
         end do jx_loop
@@ -282,8 +283,8 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
     ky_loop : do k = 0, mz+1
         iy_loop : do i = 0, mx+1
 
-            do m = 1,meqn
-                do j = 1-mbc, my+mbc
+            do j = 1-mbc, my+mbc
+                do m = 1,meqn
                     !! # copy data along a slice into 1d array:
                     q1d(m,j) = qold(i,j,k,m)
                 end do
@@ -296,8 +297,8 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
             endif
 
             if (maux .gt. 0)  then
-                do ma = 1,maux
-                    do j = 1-mbc, my+mbc
+                do j = 1-mbc, my+mbc
+                    do ma = 1,maux
                         aux1(ma,j,1) = aux(i-1,j,k-1,ma)
                         aux1(ma,j,2) = aux(i,  j,k-1,ma)
                         aux1(ma,j,3) = aux(i+1,j,k-1,ma)
@@ -354,38 +355,38 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
             !! # gadd - modifies the h-fluxes
             !! # hadd - modifies the f-fluxes
 
-            do  m = 1,meqn
-                do  j = 1,my+1
-                    gm(m,i,j,k) = gm(m,i,j,k) + faddm(m,j)
-                    gp(m,i,j,k) = gp(m,i,j,k) + faddp(m,j)
+            do  j = 1,my+1
+                do  m = 1,meqn
+                    gm(i,j,k,m) = gm(i,j,k,m) + faddm(m,j)
+                    gp(i,j,k,m) = gp(i,j,k,m) + faddp(m,j)
 
-                    hm(m,i-1,j,k) = hm(m,i-1,j,k) + gadd(m,j,1,-1)
-                    hp(m,i-1,j,k) = hp(m,i-1,j,k) + gadd(m,j,1,-1)
-                    hm(m,i  ,j,k) = hm(m,i  ,j,k) + gadd(m,j,1, 0)
-                    hp(m,i  ,j,k) = hp(m,i  ,j,k) + gadd(m,j,1, 0)
-                    hm(m,i+1,j,k) = hm(m,i+1,j,k) + gadd(m,j,1, 1)
-                    hp(m,i+1,j,k) = hp(m,i+1,j,k) + gadd(m,j,1, 1)
+                    hm(i-1,j,k,m) = hm(i-1,j,k,m) + gadd(j,m,1,-1)
+                    hp(i-1,j,k,m) = hp(i-1,j,k,m) + gadd(j,m,1,-1)
+                    hm(i  ,j,k,m) = hm(i  ,j,k,m) + gadd(j,m,1, 0)
+                    hp(i  ,j,k,m) = hp(i  ,j,k,m) + gadd(j,m,1, 0)
+                    hm(i+1,j,k,m) = hm(i+1,j,k,m) + gadd(j,m,1, 1)
+                    hp(i+1,j,k,m) = hp(i+1,j,k,m) + gadd(j,m,1, 1)
 
-                    hm(m,i-1,j,k+1) = hm(m,i-1,j,k+1) + gadd(m,j,2,-1)
-                    hp(m,i-1,j,k+1) = hp(m,i-1,j,k+1) + gadd(m,j,2,-1)
-                    hm(m,i  ,j,k+1) = hm(m,i  ,j,k+1) + gadd(m,j,2, 0)
-                    hp(m,i  ,j,k+1) = hp(m,i  ,j,k+1) + gadd(m,j,2, 0)
-                    hm(m,i+1,j,k+1) = hm(m,i+1,j,k+1) + gadd(m,j,2, 1)
-                    hp(m,i+1,j,k+1) = hp(m,i+1,j,k+1) + gadd(m,j,2, 1)
+                    hm(i-1,j,k+1,m) = hm(i-1,j,k+1,m) + gadd(j,m,2,-1)
+                    hp(i-1,j,k+1,m) = hp(i-1,j,k+1,m) + gadd(j,m,2,-1)
+                    hm(i  ,j,k+1,m) = hm(i  ,j,k+1,m) + gadd(j,m,2, 0)
+                    hp(i  ,j,k+1,m) = hp(i  ,j,k+1,m) + gadd(j,m,2, 0)
+                    hm(i+1,j,k+1,m) = hm(i+1,j,k+1,m) + gadd(j,m,2, 1)
+                    hp(i+1,j,k+1,m) = hp(i+1,j,k+1,m) + gadd(j,m,2, 1)
 
-                    fm(m,i  ,j,k-1) = fm(m,i  ,j,k-1) + hadd(m,j,1,-1)
-                    fp(m,i  ,j,k-1) = fp(m,i  ,j,k-1) + hadd(m,j,1,-1)
-                    fm(m,i  ,j,k  ) = fm(m,i  ,j,k  ) + hadd(m,j,1, 0)
-                    fp(m,i  ,j,k  ) = fp(m,i  ,j,k  ) + hadd(m,j,1, 0)
-                    fm(m,i  ,j,k+1) = fm(m,i  ,j,k+1) + hadd(m,j,1, 1)
-                    fp(m,i  ,j,k+1) = fp(m,i  ,j,k+1) + hadd(m,j,1, 1)
+                    fm(i  ,j,k-1,m) = fm(i  ,j,k-1,m) + hadd(j,m,1,-1)
+                    fp(i  ,j,k-1,m) = fp(i  ,j,k-1,m) + hadd(j,m,1,-1)
+                    fm(i  ,j,k  ,m) = fm(i  ,j,k  ,m) + hadd(j,m,1, 0)
+                    fp(i  ,j,k  ,m) = fp(i  ,j,k  ,m) + hadd(j,m,1, 0)
+                    fm(i  ,j,k+1,m) = fm(i  ,j,k+1,m) + hadd(j,m,1, 1)
+                    fp(i  ,j,k+1,m) = fp(i  ,j,k+1,m) + hadd(j,m,1, 1)
 
-                    fm(m,i+1,j,k-1) = fm(m,i+1,j,k-1) + hadd(m,j,2,-1)
-                    fp(m,i+1,j,k-1) = fp(m,i+1,j,k-1) + hadd(m,j,2,-1)
-                    fm(m,i+1,j,k  ) = fm(m,i+1,j,k  ) + hadd(m,j,2, 0)
-                    fp(m,i+1,j,k  ) = fp(m,i+1,j,k  ) + hadd(m,j,2, 0)
-                    fm(m,i+1,j,k+1) = fm(m,i+1,j,k+1) + hadd(m,j,2, 1)
-                    fp(m,i+1,j,k+1) = fp(m,i+1,j,k+1) + hadd(m,j,2, 1)
+                    fm(i+1,j,k-1,m) = fm(i+1,j,k-1,m) + hadd(j,m,2,-1)
+                    fp(i+1,j,k-1,m) = fp(i+1,j,k-1,m) + hadd(j,m,2,-1)
+                    fm(i+1,j,k  ,m) = fm(i+1,j,k  ,m) + hadd(j,m,2, 0)
+                    fp(i+1,j,k  ,m) = fp(i+1,j,k  ,m) + hadd(j,m,2, 0)
+                    fm(i+1,j,k+1,m) = fm(i+1,j,k+1,m) + hadd(j,m,2, 1)
+                    fp(i+1,j,k+1,m) = fp(i+1,j,k+1,m) + hadd(j,m,2, 1)
                 end do
             end do
         end do iy_loop
@@ -399,8 +400,8 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
     jz_loop : do j = 0, my+1
         iz_loop : do i = 0, mx+1
 
-            do m = 1,meqn
-                do k = 1-mbc, mz+mbc
+            do k = 1-mbc, mz+mbc
+                do m = 1,meqn
                     !! # copy data along a slice into 1d array:
                     q1d(m,k) = qold(i,j,k,m)
                 end do
@@ -413,8 +414,8 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
             endif
 
             if (maux .gt. 0)  then
-                do  ma = 1,maux
-                    do  k = 1-mbc, mz+mbc
+                do  k = 1-mbc, mz+mbc
+                    do  ma = 1,maux
                         aux1(ma,k,1) = aux(i-1,j-1,k,ma)
                         aux1(ma,k,2) = aux(i-1,j,k,ma)
                         aux1(ma,k,3) = aux(i-1,j+1,k,ma)
@@ -471,38 +472,38 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
             !! # gadd - modifies the f-fluxes
             !! # hadd - modifies the g-fluxes
 
-             do m = 1,meqn
-                do k = 1,mz+1
-                    hm(m,i,j,k) = hm(m,i,j,k) + faddm(m,k)
-                    hp(m,i,j,k) = hp(m,i,j,k) + faddp(m,k)
+             do k = 1,mz+1
+                do m = 1,meqn
+                    hm(i,j,k,m) = hm(m,i,j,k,m) + faddm(m,k)
+                    hp(i,j,k,m) = hp(m,i,j,k,m) + faddp(m,k)
 
-                    fm(m,i  ,j-1,k) = fm(m,i  ,j-1,k) + gadd(m,k,1,-1)
-                    fp(m,i  ,j-1,k) = fp(m,i  ,j-1,k) + gadd(m,k,1,-1)
-                    fm(m,i  ,j  ,k) = fm(m,i  ,j  ,k) + gadd(m,k,1, 0)
-                    fp(m,i  ,j  ,k) = fp(m,i  ,j  ,k) + gadd(m,k,1, 0)
-                    fm(m,i  ,j+1,k) = fm(m,i  ,j+1,k) + gadd(m,k,1, 1)
-                    fp(m,i  ,j+1,k) = fp(m,i  ,j+1,k) + gadd(m,k,1, 1)
+                    fm(i  ,j-1,k,m) = fm(i  ,j-1,k,m) + gadd(k,m,1,-1)
+                    fp(i  ,j-1,k,m) = fp(i  ,j-1,k,m) + gadd(k,m,1,-1)
+                    fm(i  ,j  ,k,m) = fm(i  ,j  ,k,m) + gadd(k,m,1, 0)
+                    fp(i  ,j  ,k,m) = fp(i  ,j  ,k,m) + gadd(k,m,1, 0)
+                    fm(i  ,j+1,k,m) = fm(i  ,j+1,k,m) + gadd(k,m,1, 1)
+                    fp(i  ,j+1,k,m) = fp(i  ,j+1,k,m) + gadd(k,m,1, 1)
 
-                    fm(m,i+1,j-1,k) = fm(m,i+1,j-1,k) + gadd(m,k,2,-1)
-                    fp(m,i+1,j-1,k) = fp(m,i+1,j-1,k) + gadd(m,k,2,-1)
-                    fm(m,i+1,j  ,k) = fm(m,i+1,j  ,k) + gadd(m,k,2, 0)
-                    fp(m,i+1,j  ,k) = fp(m,i+1,j  ,k) + gadd(m,k,2, 0)
-                    fm(m,i+1,j+1,k) = fm(m,i+1,j+1,k) + gadd(m,k,2, 1)
-                    fp(m,i+1,j+1,k) = fp(m,i+1,j+1,k) + gadd(m,k,2, 1)
+                    fm(i+1,j-1,k,m) = fm(i+1,j-1,k,m) + gadd(k,m,2,-1)
+                    fp(i+1,j-1,k,m) = fp(i+1,j-1,k,m) + gadd(k,m,2,-1)
+                    fm(i+1,j  ,k,m) = fm(i+1,j  ,k,m) + gadd(k,m,2, 0)
+                    fp(i+1,j  ,k,m) = fp(i+1,j  ,k,m) + gadd(k,m,2, 0)
+                    fm(i+1,j+1,k,m) = fm(i+1,j+1,k,m) + gadd(k,m,2, 1)
+                    fp(i+1,j+1,k,m) = fp(i+1,j+1,k,m) + gadd(k,m,2, 1)
 
-                    gm(m,i-1,j  ,k) = gm(m,i-1,j  ,k) + hadd(m,k,1,-1)
-                    gp(m,i-1,j  ,k) = gp(m,i-1,j  ,k) + hadd(m,k,1,-1)
-                    gm(m,i  ,j  ,k) = gm(m,i  ,j  ,k) + hadd(m,k,1, 0)
-                    gp(m,i  ,j  ,k) = gp(m,i  ,j  ,k) + hadd(m,k,1, 0)
-                    gm(m,i+1,j  ,k) = gm(m,i+1,j  ,k) + hadd(m,k,1, 1)
-                    gp(m,i+1,j  ,k) = gp(m,i+1,j  ,k) + hadd(m,k,1, 1)
+                    gm(i-1,j  ,k,m) = gm(i-1,j  ,k,m) + hadd(k,m,1,-1)
+                    gp(i-1,j  ,k,m) = gp(i-1,j  ,k,m) + hadd(k,m,1,-1)
+                    gm(i  ,j  ,k,m) = gm(i  ,j  ,k,m) + hadd(k,m,1, 0)
+                    gp(i  ,j  ,k,m) = gp(i  ,j  ,k,m) + hadd(k,m,1, 0)
+                    gm(i+1,j  ,k,m) = gm(i+1,j  ,k,m) + hadd(k,m,1, 1)
+                    gp(i+1,j  ,k,m) = gp(i+1,j  ,k,m) + hadd(k,m,1, 1)
 
-                    gm(m,i-1,j+1,k) = gm(m,i-1,j+1,k) + hadd(m,k,2,-1)
-                    gp(m,i-1,j+1,k) = gp(m,i-1,j+1,k) + hadd(m,k,2,-1)
-                    gm(m,i  ,j+1,k) = gm(m,i  ,j+1,k) + hadd(m,k,2, 0)
-                    gp(m,i  ,j+1,k) = gp(m,i  ,j+1,k) + hadd(m,k,2, 0)
-                    gm(m,i+1,j+1,k) = gm(m,i+1,j+1,k) + hadd(m,k,2, 1)
-                    gp(m,i+1,j+1,k) = gp(m,i+1,j+1,k) + hadd(m,k,2, 1)                    
+                    gm(i-1,j+1,k,m) = gm(i-1,j+1,k,m) + hadd(k,m,2,-1)
+                    gp(i-1,j+1,k,m) = gp(i-1,j+1,k,m) + hadd(k,m,2,-1)
+                    gm(i  ,j+1,k,m) = gm(i  ,j+1,k,m) + hadd(k,m,2, 0)
+                    gp(i  ,j+1,k,m) = gp(i  ,j+1,k,m) + hadd(k,m,2, 0)
+                    gm(i+1,j+1,k,m) = gm(i+1,j+1,k,m) + hadd(k,m,2, 1)
+                    gp(i+1,j+1,k,m) = gp(i+1,j+1,k,m) + hadd(k,m,2, 1)                    
                 end do 
             end do
         end do iz_loop
