@@ -172,10 +172,11 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
 
     kx_loop : do k = 0,mz+1
         jx_loop : do j = 0,my+1
-            do i = 1-mbc, mx+mbc 
-                do m = 1,meqn
+
+            do m = 1,meqn
+                do i = 1-mbc, mx+mbc 
                     !! # copy data along a slice into 1d array:
-                    q1d(m,i) = qold(i,j,k,m)
+                    q1d(i,m) = qold(i,j,k,m)
                 end do
             end do
 
@@ -186,17 +187,17 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
             endif
 
             if (maux .gt. 0)  then
-                 do i = 1-mbc, mx+mbc
-                    do ma = 1,maux
-                        aux1(ma,i,1) = aux(i,j-1,k-1,ma)
-                        aux1(ma,i,2) = aux(i,j-1,k,ma)
-                        aux1(ma,i,3) = aux(i,j-1,k+1,ma)
-                        aux2(ma,i,1) = aux(i,j,k-1,ma)
-                        aux2(ma,i,2) = aux(i,j,k,ma)
-                        aux2(ma,i,3) = aux(i,j,k+1,ma)
-                        aux3(ma,i,1) = aux(i,j+1,k-1,ma)
-                        aux3(ma,i,2) = aux(i,j+1,k,ma)
-                        aux3(ma,i,3) = aux(i,j+1,k+1,ma)
+                do ma = 1,maux
+                    do i = 1-mbc, mx+mbc
+                        aux1(i,ma,1) = aux(i,j-1,k-1,ma)
+                        aux1(i,ma,2) = aux(i,j-1,k,ma)
+                        aux1(i,ma,3) = aux(i,j-1,k+1,ma)
+                        aux2(i,ma,1) = aux(i,j,k-1,ma)
+                        aux2(i,ma,2) = aux(i,j,k,ma)
+                        aux2(i,ma,3) = aux(i,j,k+1,ma)
+                        aux3(i,ma,1) = aux(i,j+1,k-1,ma)
+                        aux3(i,ma,2) = aux(i,j+1,k,ma)
+                        aux3(i,ma,3) = aux(i,j+1,k+1,ma)
                     end do
                 end do
             endif
@@ -238,10 +239,10 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
 
             !! # update fluxes for use in AMR:
 
-             do i = 1,mx+1
-                do m = 1,meqn
-                    fm(i,j,k,m) = fm(i,j,k,m) + faddm(m,i)
-                    fp(i,j,k,m) = fp(i,j,k,m) + faddp(m,i)
+            do m = 1,meqn
+                do i = 1,mx+1
+                    fm(i,j,k,m) = fm(i,j,k,m) + faddm(i,m)
+                    fp(i,j,k,m) = fp(i,j,k,m) + faddp(i,m)
 
                     gm(i,j  ,k-1,m) = gm(i,j  ,k-1,m) + gadd(i,m,1,-1)
                     gp(i,j  ,k-1,m) = gp(i,j  ,k-1,m) + gadd(i,m,1,-1)
@@ -283,10 +284,10 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
     ky_loop : do k = 0, mz+1
         iy_loop : do i = 0, mx+1
 
-            do j = 1-mbc, my+mbc
-                do m = 1,meqn
+            do m = 1,meqn
+                do j = 1-mbc, my+mbc
                     !! # copy data along a slice into 1d array:
-                    q1d(m,j) = qold(i,j,k,m)
+                    q1d(j,m) = qold(i,j,k,m)
                 end do
             end do
 
@@ -297,17 +298,17 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
             endif
 
             if (maux .gt. 0)  then
-                do j = 1-mbc, my+mbc
-                    do ma = 1,maux
-                        aux1(ma,j,1) = aux(i-1,j,k-1,ma)
-                        aux1(ma,j,2) = aux(i,  j,k-1,ma)
-                        aux1(ma,j,3) = aux(i+1,j,k-1,ma)
-                        aux2(ma,j,1) = aux(i-1,j,k,  ma)
-                        aux2(ma,j,2) = aux(i,  j,k,  ma)
-                        aux2(ma,j,3) = aux(i+1,j,k,  ma)
-                        aux3(ma,j,1) = aux(i-1,j,k+1,ma)
-                        aux3(ma,j,2) = aux(i,  j,k+1,ma)
-                        aux3(ma,j,3) = aux(i+1,j,k+1,ma)
+                do ma = 1,maux
+                    do j = 1-mbc, my+mbc
+                        aux1(j,ma,1) = aux(i-1,j,k-1,ma)
+                        aux1(j,ma,2) = aux(i,  j,k-1,ma)
+                        aux1(j,ma,3) = aux(i+1,j,k-1,ma)
+                        aux2(j,ma,1) = aux(i-1,j,k,  ma)
+                        aux2(j,ma,2) = aux(i,  j,k,  ma)
+                        aux2(j,ma,3) = aux(i+1,j,k,  ma)
+                        aux3(j,ma,1) = aux(i-1,j,k+1,ma)
+                        aux3(j,ma,2) = aux(i,  j,k+1,ma)
+                        aux3(j,ma,3) = aux(i+1,j,k+1,ma)
                     end do
                 end do
             endif
@@ -355,10 +356,10 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
             !! # gadd - modifies the h-fluxes
             !! # hadd - modifies the f-fluxes
 
-            do  j = 1,my+1
-                do  m = 1,meqn
-                    gm(i,j,k,m) = gm(i,j,k,m) + faddm(m,j)
-                    gp(i,j,k,m) = gp(i,j,k,m) + faddp(m,j)
+            do  m = 1,meqn
+                do  j = 1,my+1
+                    gm(i,j,k,m) = gm(i,j,k,m) + faddm(j,m)
+                    gp(i,j,k,m) = gp(i,j,k,m) + faddp(j,m)
 
                     hm(i-1,j,k,m) = hm(i-1,j,k,m) + gadd(j,m,1,-1)
                     hp(i-1,j,k,m) = hp(i-1,j,k,m) + gadd(j,m,1,-1)
@@ -400,10 +401,10 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
     jz_loop : do j = 0, my+1
         iz_loop : do i = 0, mx+1
 
-            do k = 1-mbc, mz+mbc
-                do m = 1,meqn
+            do m = 1,meqn
+                do k = 1-mbc, mz+mbc
                     !! # copy data along a slice into 1d array:
-                    q1d(m,k) = qold(i,j,k,m)
+                    q1d(k,m) = qold(i,j,k,m)
                 end do
             end do
 
@@ -414,17 +415,17 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
             endif
 
             if (maux .gt. 0)  then
-                do  k = 1-mbc, mz+mbc
-                    do  ma = 1,maux
-                        aux1(ma,k,1) = aux(i-1,j-1,k,ma)
-                        aux1(ma,k,2) = aux(i-1,j,k,ma)
-                        aux1(ma,k,3) = aux(i-1,j+1,k,ma)
-                        aux2(ma,k,1) = aux(i,j-1,k,ma)
-                        aux2(ma,k,2) = aux(i,j,k,ma)
-                        aux2(ma,k,3) = aux(i,j+1,k,ma)
-                        aux3(ma,k,1) = aux(i+1,j-1,k,ma)
-                        aux3(ma,k,2) = aux(i+1,j,k,ma)
-                        aux3(ma,k,3) = aux(i+1,j+1,k,ma)
+                do  ma = 1,maux
+                    do  k = 1-mbc, mz+mbc
+                        aux1(k,ma,1) = aux(i-1,j-1,k,ma)
+                        aux1(k,ma,2) = aux(i-1,j,k,ma)
+                        aux1(k,ma,3) = aux(i-1,j+1,k,ma)
+                        aux2(k,ma,1) = aux(i,j-1,k,ma)
+                        aux2(k,ma,2) = aux(i,j,k,ma)
+                        aux2(k,ma,3) = aux(i,j+1,k,ma)
+                        aux3(k,ma,1) = aux(i+1,j-1,k,ma)
+                        aux3(k,ma,2) = aux(i+1,j,k,ma)
+                        aux3(k,ma,3) = aux(i+1,j+1,k,ma)
                     end do
                 end do
             endif
@@ -472,10 +473,10 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
             !! # gadd - modifies the f-fluxes
             !! # hadd - modifies the g-fluxes
 
-             do k = 1,mz+1
-                do m = 1,meqn
-                    hm(i,j,k,m) = hm(m,i,j,k,m) + faddm(m,k)
-                    hp(i,j,k,m) = hp(m,i,j,k,m) + faddp(m,k)
+            do m = 1,meqn
+                do k = 1,mz+1
+                    hm(i,j,k,m) = hm(i,j,k,m) + faddm(m,k)
+                    hp(i,j,k,m) = hp(i,j,k,m) + faddp(m,k)
 
                     fm(i  ,j-1,k,m) = fm(i  ,j-1,k,m) + gadd(k,m,1,-1)
                     fp(i  ,j-1,k,m) = fp(i  ,j-1,k,m) + gadd(k,m,1,-1)

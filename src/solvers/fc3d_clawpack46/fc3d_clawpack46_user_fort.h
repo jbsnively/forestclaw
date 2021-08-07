@@ -97,28 +97,28 @@ void CLAWPACK46_SRC3(const int* meqn,
 #define CLAWPACK46_RPN3 FCLAW_F77_FUNC(clawpack46_rpn3,  CLAWPACK46_RPN3)
 void CLAWPACK46_RPN3(const int* ixyz,const int* maxm, 
                      const int* meqn, const int* mwaves,
-                     const int* maux, const int* mbc, const int* mx, 
+                     const int* mbc, const int* mx, 
                      double ql[], double qr[],
-                     double auxl[], double auxr[], double wave[],
+                     double auxl[], double auxr[], const int* maux, double wave[],
                      double s[], double amdq[], double apdq[]);
 
 #define CLAWPACK46_RPT3 FCLAW_F77_FUNC(clawpack46_rpt3, CLAWPACK46_RPT3)
-void CLAWPACK46_RPT3(const int* ixyz, const int* icoor, const int* imp,
-                     const int *maxm, const int* meqn, const int* mwaves, 
-                     const int *maux, 
-                     const int* mbc, const int* mx, double ql[], double qr[],
-                     double aux1[], double aux2[], double aux3[], 
-                     double asdq[], double bmasdq[], double bpasdq[]);
+void CLAWPACK46_RPT3(const int* ixyz, const int* icoor, 
+                     const int* maxm, const int* meqn, 
+                     const int* mwaves,const int* mbc, const int* mx, 
+                     double ql[], double qr[],
+                     double aux1[], double aux2[], double aux3[], const int* maux,  const int* ilr,
+                     double dsdq[], double bmasdq[], double bpasdq[]);
+
 
 #define CLAWPACK46_RPTT3    FCLAW_F77_FUNC(clawpack46_rptt3, CLAWPACK46_RPTT3)
-void CLAWPACK46_RPTT3(const int* ixyz, const int* icoor, const int* imp,
-                      const int* impt, const int* maxm, const int* meqn,
-                      const int* mwaves, const int* maux,
-                      const int* mbc,const int* mx,
+void CLAWPACK46_RPTT3(const int* ixyz, const int* icoor, 
+                      const int* maxm, const int* meqn,
+                      const int* mwaves,const int* mbc,const int* mx,
                       double ql[], double qr[],
                       double aux1[], double aux2[],
-                      double aux3[],  double bsasdq[],
-                      double cmbsasdq[], double cpbsasdq[]);
+                      double aux3[],  const int* maux, const int* ilr, const int* impt, 
+                      double bsasdq[], double cmbsasdq[], double cpbsasdq[]);
 
 /* --------------------------------- Tagging routines  -------------------------------- */
 

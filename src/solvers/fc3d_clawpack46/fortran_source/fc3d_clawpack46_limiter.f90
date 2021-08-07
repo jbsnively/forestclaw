@@ -26,8 +26,8 @@ subroutine clawpack46_limiter(maxm,meqn,mwaves,mbc,mx, &
     integer :: maxm, meqn, mwaves, mbc, mx
 
     integer :: mthlim(mwaves)
-    double precision :: wave(meqn,mwaves,1-mbc:maxm+mbc)
-    double precision :: s(mwaves,1-mbc:maxm+mbc)
+    double precision :: wave(1-mbc:maxm+mbc,meqn,mwaves)
+    double precision :: s(1-mbc:maxm+mbc,mwaves)
 
     integer :: mw,i, m
     double precision :: dotr, wnorm2, dotl, wlimitr
@@ -43,8 +43,8 @@ subroutine clawpack46_limiter(maxm,meqn,mwaves,mbc,mx, &
             dotl = dotr
             dotr = 0.d0
             do m = 1,meqn
-                wnorm2 = wnorm2 + wave(m,mw,i)**2
-                dotr = dotr + wave(m,mw,i)*wave(m,mw,i+1)
+                wnorm2 = wnorm2 + wave(i,m,mw)**2
+                dotr = dotr + wave(i,m,mw)*wave(i+1,m,mw)
             enddo
 
             if (i .gt. 0 .and. wnorm2 .ne. 0) then
@@ -55,7 +55,7 @@ subroutine clawpack46_limiter(maxm,meqn,mwaves,mbc,mx, &
                 endif
 
                 do m = 1,meqn
-                    wave(m,mw,i) = wlimitr * wave(m,mw,i)
+                    wave(i,m,mw) = wlimitr * wave(i,m,mw)
                 end do
             endif
         end do i_loop

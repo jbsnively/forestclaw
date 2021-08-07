@@ -106,32 +106,29 @@ typedef void (*clawpack46_fort_src3_t)(const int* meqn,
 									   const int* maux, double aux[], const double* t,
 									   const double* dt);
 
-typedef void (*clawpack46_fort_rpn3_t)(const int* ixyz,const int* maxm, 
+
+typedef void (*clawpack46_fort_rpn3_t)(const int* ixyz, const int* maxm, 
                                        const int* meqn, const int* mwaves,
-                                       const int* maux, const int* mbc,const int* mx, 
+                                       const int* mbc,const int* mx, 
                                        double ql[], double qr[],
-                                       double auxl[], double auxr[], double wave[],
+                                       double auxl[], double auxr[], const int* maux, double wave[],
                                        double s[], double amdq[], double apdq[]);
 
 
 typedef void (*clawpack46_fort_rpt3_t)(const int* ixyz, const int* icoor, 
-                                       const int* imp,
-                                       const int *maxm, const int* meqn, 
-                                       const int* mwaves, const int *maux,
-                                       const int* mbc, const int* mx, 
+                                       const int* maxm, const int* meqn, 
+                                       const int* mwaves,const int* mbc, const int* mx, 
                                        double ql[], double qr[],
-                                       double aux1[], double aux2[], double aux3[], 
+                                       double aux1[], double aux2[], double aux3[], const int* maux,  const int* ilr,
                                        double dsdq[], double bmasdq[], double bpasdq[]);
 
 typedef void (*clawpack46_fort_rptt3_t)(const int* ixyz, const int* icoor, 
-                                        const int* imp, const int* impt, 
-                                        const int* maxm, const int* meqn,
-                                        const int* mwaves, const int* maux,
-                                        const int* mbc,const int* mx,
-                                        double ql[], double qr[],
-                                        double aux1[], double aux2[], double aux3[],  
-                                        double bsasdq[], 
-                                        double cmbsasdq[], double cpbsasdq[]);
+                                       const int* maxm, const int* meqn,
+                                       const int* mwaves,const int* mbc,const int* mx,
+                                       double ql[], double qr[],
+                                       double aux1[], double aux2[],
+                                       double aux3[],  const int* maux, const int* ilr, const int* impt, 
+                                       double bsasdq[], double cmbsasdq[], double cpbsasdq[]);
 
 
 typedef void (*clawpack46_fort_flux3_t)(const int* ixyz,const int* maxm, const int* meqn, 
