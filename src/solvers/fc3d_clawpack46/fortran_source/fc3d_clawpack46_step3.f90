@@ -475,8 +475,8 @@ subroutine clawpack46_step3(maxm,meqn,maux,mbc,mx,my,mz, &
 
             do m = 1,meqn
                 do k = 1,mz+1
-                    hm(i,j,k,m) = hm(i,j,k,m) + faddm(m,k)
-                    hp(i,j,k,m) = hp(i,j,k,m) + faddp(m,k)
+                    hm(i,j,k,m) = hm(i,j,k,m) + faddm(k,m)
+                    hp(i,j,k,m) = hp(i,j,k,m) + faddp(k,m)
 
                     fm(i  ,j-1,k,m) = fm(i  ,j-1,k,m) + gadd(k,m,1,-1)
                     fp(i  ,j-1,k,m) = fp(i  ,j-1,k,m) + gadd(k,m,1,-1)

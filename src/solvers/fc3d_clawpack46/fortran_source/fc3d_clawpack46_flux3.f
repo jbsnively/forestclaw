@@ -125,7 +125,6 @@ c      use amr_module
       integer ixyz, maxm, meqn, maux, mbc, mx, mwaves, mcapa
       integer mthlim(mwaves), method(7)
       double precision cfl1d, dtdy, dtdz
-      integer use_fwaves
 
       double precision     q1d(1-mbc:maxm+mbc, meqn)
       double precision    amdq(1-mbc:maxm+mbc, meqn)
@@ -185,7 +184,7 @@ c
 
       integer mw, m, i,m3, m4
       double precision dtdxave
-
+      integer use_fwaves
 
       limit = .false.
       do mw = 1,mwaves
@@ -197,8 +196,8 @@ c
 c     # initialize flux increments:
 c     -----------------------------
 c     
-      do m = 1,meqn
-         do i = 1-mbc, mx+mbc
+      do i = 1-mbc, mx+mbc
+         do m = 1,meqn
             faddm(i,m) = 0.d0
             faddp(i,m) = 0.d0
             gadd(i,m,1,-1) = 0.d0
@@ -233,7 +232,7 @@ c     # aux2(1-mbc,1,2) is the start of a 1d array now used by rpn3
      
       if (maux > 0) then
          call rpn3(ixyz,maxm,meqn,mwaves,mbc,mx,q1d,q1d,
-     &           aux2(1,1-mbc,2),aux2(1,1-mbc,2),maux,
+     &           aux2(1-mbc,1,2),aux2(1-mbc,1,2),maux,
      &           wave,s,amdq,apdq)
       else
          call rpn3(ixyz,maxm,meqn,mwaves,mbc,mx,q1d,q1d,
@@ -387,8 +386,8 @@ c            # in the z-like direction
      &              aux1,aux2,aux3,maux,0,cqxx,cmcqxxm,cpcqxxm)
 
 c             # use the same splitting to left and right:
-              do m = 1,meqn
-                 do i = 0,mx+2
+              do i = 0,mx+2
+                 do m = 1,meqn
                     bmcqxxp(i,m) = bmcqxxm(i,m)
                     bpcqxxp(i,m) = bpcqxxm(i,m)
                     cmcqxxp(i,m) = cmcqxxm(i,m)
@@ -406,8 +405,8 @@ c     # If the correction wave also propagates in a 3D sense, incorporate
 c     # cpcqxx,... into cmamdq, cpamdq, ... so that it is split also.
 c     
       if (m4 .eq. 1) then
-          do i = 0, mx+2
-              do m = 1, meqn
+          do m = 1, meqn
+              do i = 0, mx+2
                   cpapdq2(i,m) = cpapdq(i,m)
                   cpamdq2(i,m) = cpamdq(i,m)
                   cmapdq2(i,m) = cmapdq(i,m)
@@ -415,8 +414,8 @@ c
               end do
           end do
       else if (m4 .eq. 2) then
-          do i = 0, mx+2
-              do m = 1, meqn
+          do m = 1, meqn
+              do i = 0, mx+2
                   cpapdq2(i,m) = cpapdq(i,m) - 3.d0*cpcqxxp(i,m)
                   cpamdq2(i,m) = cpamdq(i,m) + 3.d0*cpcqxxm(i,m)
                   cmapdq2(i,m) = cmapdq(i,m) - 3.d0*cmcqxxp(i,m)
@@ -446,8 +445,8 @@ c     -----------------------------
 c     # The updates for G fluxes :
 c     -----------------------------
 c     
-      ig_loop : do i = 1, mx+1
-          meqng_loop : do m = 1,meqn
+      meqng_loop : do m = 1,meqn
+          ig_loop : do i = 1, mx+1
      
 c             # Transverse propagation of the increment waves
 c             # between cells sharing interfaces, i.e. the 2D approach.
@@ -525,8 +524,9 @@ c
                 gadd(i-1,m,1,0) = gadd(i-1,m,1,0)
      &                         - dtdx1d(i-1)*bmcqxxm(i,m)
               endif
-          end do meqng_loop
-      end do ig_loop
+          end do ig_loop
+      end do meqng_loop
+
 c     
 c     
 c     --------------------------------------------
@@ -537,8 +537,8 @@ c     # If the correction wave also propagates in a 3D sense, incorporate
 c     # cqxx into bmamdq, bpamdq, ... so that is is split also.
 c     
       if (m4 .eq. 2) then
-          do i = 0, mx+2
-              do m = 1, meqn
+          do m = 1, meqn
+              do i = 0, mx+2
                   bpapdq(i,m) = bpapdq(i,m) - 3.d0*bpcqxxp(i,m)
                   bpamdq(i,m) = bpamdq(i,m) + 3.d0*bpcqxxm(i,m)
                   bmapdq(i,m) = bmapdq(i,m) - 3.d0*bmcqxxp(i,m)
@@ -572,8 +572,8 @@ c     -----------------------------
 c     # The updates for H fluxes :
 c     -----------------------------
 c     
-      ih_loop : do i = 1, mx+1
-          meqnh_loop : do m = 1,meqn
+      meqnh_loop : do m = 1,meqn
+          ih_loop : do i = 1, mx+1
 c     
 c             # Transverse propagation of the increment waves
 c             # between cells sharing interfaces, i.e. the 2D approach.
@@ -653,7 +653,8 @@ c
                 hadd(i-1,m,1,0) = hadd(i-1,m,1,0)
      &                         - dtdx1d(i-1)*cmcqxxm(i,m)
               endif
-          end do meqnh_loop
-      end do ih_loop
+          end do ih_loop
+      end do meqnh_loop  
+c
       return
       end
