@@ -66,7 +66,7 @@ typedef void (*clawpack46_fort_bc3_t)(const int* meqn, const int* mbc,
                                       const double* zlower, 
 									  const double* dx, const double* dy, 
                                       const double* dz,
-									  const double q[], const int* maux,
+									  double q[], const int* maux,
 									  const double aux[], const double* t,
 									  const double* dt, const int mthbc[]);
 

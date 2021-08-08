@@ -45,7 +45,7 @@ void CLAWPACK46_BC3_DEFAULT(const int* meqn, const int* mbc,
                             const double* xlower, const double* ylower, 
                             const double* zlower,
                             const double* dx, const double* dy, const double *dz,
-                            const double q[], const int* maux, const double aux[], 
+                            double q[], const int* maux, const double aux[], 
                             const double* t, const double* dt, const int mthbc[]);
 
 #if 0
