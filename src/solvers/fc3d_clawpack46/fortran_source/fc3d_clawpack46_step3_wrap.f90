@@ -46,6 +46,7 @@ subroutine clawpack46_step3_wrap(maxm, meqn, maux, mbc, &
     !! This should be set to actual time, in case the user wants it
     !! it for some reason in the Riemann solver.
     tcom = t
+    dtcom = dt
     dxcom = dx
     dycom = dy
     dzcom = dz
