@@ -43,9 +43,6 @@ FCLAW_ARG_ENABLE([magic3d], [Enable clawpack libraries 4.6 and magic],
 FCLAW_ARG_ENABLE([clawpack], [Enable clawpack libraries 4.6 and 5.0 and applications],
                  [CLAWPACK])
 
-FCLAW_ARG_ENABLE([clawpack3], [Enable clawpack 3d libraries and applications],
-                 [CLAWPACK3])
-
 FCLAW_ARG_ENABLE([cudaclaw], [Enable cudaclaw library and application],
                  [CUDACLAW])
 

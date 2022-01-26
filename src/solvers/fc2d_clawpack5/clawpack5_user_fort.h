@@ -29,10 +29,12 @@
 #ifdef __cplusplus
 extern "C"
 {
+#endif
+
 #if 0
-}
+/* Fix syntax highlighting */
 #endif
-#endif
+
 
 /* --------------------------------------------------------------------------------
    Clawpack 5.0 routines
@@ -112,6 +114,7 @@ void CLAWPACK5_RPT2(const int* ixy, const int* imp,
                     double bmasdq[], double bpasdq[]);
 
 
+#if 0
 #define CLAWPACK5_TAG4REFINEMENT FCLAW_F77_FUNC(clawpack5_tag4refinement, \
                                                           CLAWPACK5_TAG4REFINEMENT)
 
@@ -131,6 +134,7 @@ void CLAWPACK5_TAG4REFINEMENT(const int* mx,const int* my,
                                                 CLAWPACK5_TAG4COARSENING)
 
 void CLAWPACK5_TAG4COARSENING(const int* mx, const int* my,
+<<<<<<< HEAD
                                         const int* mbc, const int* meqn,
                                         double xlower[], double ylower[],
                                         const double* dx, const double* dy,
@@ -139,6 +143,19 @@ void CLAWPACK5_TAG4COARSENING(const int* mx, const int* my,
                                         double q2[],double q3[],
                                         const double* tag_threshold,
                                         const int* init_flag, int* tag_patch);
+=======
+                              const int* mbc, const int* meqn,
+                              double xlower[], double ylower[],
+                              const double* dx, const double* dy,
+                              const int* blockno,
+                              double q0[],double q1[],
+                              double q2[],double q3[],
+                              const double* tag_threshold,
+                              const int* initflag,
+                              int* tag_patch);
+
+#endif
+>>>>>>> upstream/develop
 
 
 #ifdef __cplusplus

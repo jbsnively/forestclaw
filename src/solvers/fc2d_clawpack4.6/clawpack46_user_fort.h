@@ -29,11 +29,11 @@
 #ifdef __cplusplus
 extern "C"
 {
-#if 0
-}
-#endif
 #endif
 
+#if 0
+/* Fix syntax highlighting */
+#endif
 
 /* --------------------------------------------------------------------------------
    Clawpack 4.6 routines
@@ -117,7 +117,7 @@ void CLAWPACK46_RPT2FW(const int* ixy, const int* maxm, const int* meqn, const i
                      double dsdq[], double bmasdq[], double bpasdq[]);
 
 
-
+#if 0
 /* These should actually be called CLAWPATCH46_TAG4REFINEMENT,  
    CLAWPATCH46_TAG4COARSENING */
 #define CLAWPACK46_TAG4REFINEMENT FCLAW_F77_FUNC(clawpack46_tag4refinement, \
@@ -139,6 +139,7 @@ void CLAWPACK46_TAG4REFINEMENT(const int* mx,const int* my,
                                                 CLAWPACK46_TAG4COARSENING)
 
 void CLAWPACK46_TAG4COARSENING(const int* mx, const int* my,
+<<<<<<< HEAD
                                         const int* mbc, const int* meqn,
                                         double xlower[], double ylower[],
                                         const double* dx, const double* dy,
@@ -147,11 +148,20 @@ void CLAWPACK46_TAG4COARSENING(const int* mx, const int* my,
                                         double q2[],double q3[],
                                         const double* tag_threshold,
                                         const int* init_flag, int* tag_patch);
+=======
+                               const int* mbc, const int* meqn,
+                               double xlower[], double ylower[],
+                               const double* dx, const double* dy,
+                               const int* blockno,
+                               double q0[],double q1[],
+                               double q2[],double q3[],
+                               const double* tag_threshold,
+                               const int* initflag,
+                               int* tag_patch);
+#endif
+>>>>>>> upstream/develop
 
 #ifdef __cplusplus
-#if 0
-{
-#endif
 }
 #endif
 

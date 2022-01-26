@@ -1,3 +1,13 @@
+c> @file
+c> ascii output routines for clawpack 4.6
+
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_header_ascii_t
+c>
+c> Implementation for clawpack 4.6.
+c>
+c> @details @copydetails ::clawpatch_fort_header_ascii_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch46_fort_header_ascii
      &      (matname1,matname2, time,meqn,maux,ngrids)
       implicit none
@@ -27,6 +37,13 @@
 
       end
 
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_output_ascii_t
+c>
+c> Implementation for clawpack 4.6.
+c>
+c> @details @copydetails ::clawpatch_fort_output_ascii_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch46_fort_output_ascii(matname1,
      &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
      &      q,patch_num,level,blockno,mpirank)
@@ -52,10 +69,17 @@
      &      blockno,mpirank)
 
 
+<<<<<<< HEAD
       if (meqn .gt. 10) then
          write(6,'(A,A,A,I5,A)')     
      &         'Warning (fclaw2d_fort_write_grid_header.f) ',
      &         ': meqn > 10; change format statement 120.', 
+=======
+      if (meqn .gt. 20) then
+         write(6,'(A,A,A,I5,A)')     
+     &         'Warning (fclaw2d_clawpatch46_output_ascii.f) ',
+     &         ': meqn > 20; change format statement 120.', 
+>>>>>>> upstream/develop
      &         '(meqn = ',meqn,')'
          stop
       endif
@@ -71,14 +95,31 @@
          enddo
          write(matunit1,*) ' '
       enddo
+<<<<<<< HEAD
 c     # This statement is checked above (meqn <= 10)
   120 format (10E26.16)
+=======
+c     # This statement is checked above (meqn <= 20)
+  120 format (20E26.16)
+>>>>>>> upstream/develop
 
       close(matunit1)
 
       end
 
 
+c--------------------------------------------------------------------
+c> @brief Writes the header for a grid
+c>
+c> @param [in] matunit1 handle for data file
+c> @param [in] mx, my the number of cells in the x and y directions
+c> @param [in] xlower, ylower lower left coordinate of patch
+c> @param [in] dx, dy the spacings in the x and y directions
+c> @param [in] patch_num the patch number
+c> @param [in] level the level
+c> @param [in] blockno the block number
+c> @param [in] mpiran the mpi rank
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch46_fort_write_grid_header
      &      (matunit1, mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)

@@ -1,3 +1,13 @@
+c> @file
+c> ascii output routines for clawpack 5
+
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_header_ascii_t
+c>
+c> Implementation for clawpack 5.
+c>
+c> @details @copydetails ::clawpatch_fort_header_ascii_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_header_ascii(matname1,matname2, 
      &     time, meqn,maux, ngrids)
                                                  
@@ -28,6 +38,13 @@
       end
 
 
+c--------------------------------------------------------------------
+c> @brief @copybrief ::clawpatch_fort_output_ascii_t
+c>
+c> Implementation for clawpack 5.
+c>
+c> @details @copydetails ::clawpatch_fort_output_ascii_t
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_output_ascii(matname1,
      &      mx,my,meqn,mbc, xlower,ylower, dx,dy,
      &      q,patch_num,level,blockno,mpirank)
@@ -51,9 +68,10 @@
      &      blockno,mpirank)
 
 
-      if (meqn .gt. 5) then
-         write(6,'(A,A)') 'Warning (fclaw2d_fort_write_file.f) ',
-     &         ': meqn > 5;  change format statement 109.'
+      if (meqn .gt. 20) then
+         write(6,'(A,A)') 
+     &       'Warning (fclaw2d_clawpatch5_fort_output_ascii) ',
+     &         ': meqn > 20;  change format statement 90.'
          stop
       endif
 
@@ -69,12 +87,24 @@ c      write(6,*) 'WARNING : (claw_out2.f ) Setting q to 0'
          enddo
          write(matunit1,*) ' '
       enddo
-  120 format (5E26.16)
+  120 format (20E26.16)
 
       close(matunit1)
 
       end
-
+ 
+c--------------------------------------------------------------------
+c> @brief Writes the header for a grid
+c>
+c> @param [in] matunit1 handle for data file
+c> @param [in] mx, my the number of cells in the x and y directions
+c> @param [in] xlower, ylower lower left coordinate of patch
+c> @param [in] dx, dy the spacings in the x and y directions
+c> @param [in] patch_num the patch number
+c> @param [in] level the level
+c> @param [in] blockno the block number
+c> @param [in] mpiran the mpi rank
+c--------------------------------------------------------------------
       subroutine fclaw2d_clawpatch5_fort_write_grid_header(matunit1,
      &      mx,my,xlower,ylower, dx,dy,patch_num,level,
      &      blockno,mpirank)
