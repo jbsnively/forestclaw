@@ -1168,3 +1168,6 @@ applications/clawpack/advection/3d/filament/filament
 applications/clawpack/advection/3d/filament/user_4.6/.deps/.dirstamp
 applications/clawpack/advection/3d/filament/user_4.6/.dirstamp
 applications/clawpack/advection/3d/swirl/brick.dat
+.fortran_dependencies/dependencies.mk
+autom4te.cache/output.6
+autom4te.cache/traces.6
