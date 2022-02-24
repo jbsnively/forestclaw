@@ -111,6 +111,43 @@ include applications/cudaclaw/cudaclaw.apps
 
 endif
 
+
+# --------------------------------------------
+# Clawpack 4.6 and 5.0 libraries and examples
+# --------------------------------------------
+
+if FCLAW_ENABLE_MAGIC2D
+
+## Patches needed for Clawpack solvers
+include src/patches/clawpatch/Makefile.am
+
+## Solver libraries (most example apps require both)
+include src/solvers/fc2d_clawpack4.6/Makefile.am
+include src/solvers/fc2d_clawpack5/Makefile.am
+
+## examples
+include magicforest/2d/Makefile.am
+
+endif
+
+# --------------------------------------------
+# Clawpack 4.6 and 5.0 libraries and examples
+# --------------------------------------------
+
+if FCLAW_ENABLE_MAGIC3D
+
+## Patches needed for Clawpack solvers
+include src/patches/clawpatch/Makefile.am
+
+## Solver libraries (most example apps require both)
+include src/solvers/fc3d_clawpack46/Makefile.am
+
+## examples
+include magicforest/3d/Makefile.am
+
+endif
+
+
 # --------------------------------------------
 # Magic Forest
 # --------------------------------------------
