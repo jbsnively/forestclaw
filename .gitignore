@@ -2552,3 +2552,12 @@ CMakeFiles/CMakeTmp/CMakeFiles/cmTC_40dba.dir/link.txt
 CMakeFiles/CMakeTmp/CheckIncludeFile.c
 CMakeFiles/CMakeTmp/CMakeFiles/cmTC_e341a.dir/compiler_depend.ts
 CMakeFiles/CMakeTmp/CMakeFiles/cmTC_e341a.dir/link.txt
+local/include/fclaw2d_to_3d.h
+local/include/fclaw3d_convenience.h
+local/include/fclaw3d_defs.h
+local/include/fclaw3d_domain.h
+local/include/fclaw3d_global.h
+local/include/fclaw_domain.h
+local/include/fclaw_global.h
+local/include/fclaw_patch.h
+local/include/forestclaw3d.h
