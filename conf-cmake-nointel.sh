@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-home=/Users/snively
-
-
 export FC=gfortran
 export F77=gfortran
 export CC=cc
