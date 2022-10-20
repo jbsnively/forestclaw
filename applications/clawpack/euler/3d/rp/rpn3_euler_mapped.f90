@@ -57,7 +57,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 
     logical debug
 
-    data efix /.false./    !# use entropy fix for transonic rarefactions
+    data efix /.true./    !# use entropy fix for transonic rarefactions
 
     debug = .false.
     if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
@@ -119,6 +119,8 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             delta(j) = ql(j) - qr(j)
         enddo
         call rotate3(rot,delta(2))
+
+        !! --------------- Use rotated values in Riemann solve ------------
 
         !! # Solve normal Riemann problem
         call solve_riemann(uvw, enth, delta, wave,s_rot,info)
@@ -261,29 +263,47 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
                enddo
                apdq(m) = df - amdq(m)
             enddo
+
         else
             !! # No entropy fix
-            do mws = 1,mwaves
-                call rotate3_tr(rot,wave(2,mws))
-                do m = 1,meqn
-                    wave_cart(m,mws,i) = wave(m,mws)
-                enddo 
-            enddo
-
-            area = auxl(locarea,i)
-            do mws = 1,mwaves
-                s(mws,i) = area*s_rot(mws)
-            enddo
-
             do m=1,meqn
-                amdq_cart(m,i) = 0.d0
-                apdq_cart(m,i) = 0.d0
+                amdq(m) = 0.d0
+                apdq(m) = 0.d0
                 do  mws = 1,mwaves
-                    amdq_cart(m,i) = amdq_cart(m,i) + min(s(mws,i),0.d0)*wave(m,mws)
-                    apdq_cart(m,i) = apdq_cart(m,i) + max(s(mws,i),0.d0)*wave(m,mws)
-                enddo
-            enddo
-        endif  !! end of efix
+                    amdq(m) = amdq(m) + min(s_rot(mws),0.d0)*wave(m,mws)
+                    apdq(m) = apdq(m) + max(s_rot(mws),0.d0)*wave(m,mws)
+                end do
+            end do
+        endif  !! end of entropy fix
+
+        do mws = 1,mwaves
+            call rotate3_tr(rot,wave(2,mws))
+            do m = 1,meqn
+                wave_cart(m,mws,i) = wave(m,mws)
+            enddo 
+        enddo
+
+        area = auxl(locarea,i)
+        do mws = 1,mwaves
+            s(mws,i) = area*s_rot(mws)
+        enddo
+
+        call rotate3_tr(rot,apdq(2))
+        call rotate3_tr(rot,amdq(2))
+        do m = 1,meqn
+            apdq_cart(m,i) = area*apdq(m)
+            amdq_cart(m,i) = area*amdq(m)
+        end do
+
+
+!!        do m=1,meqn
+!!            amdq_cart(m,i) = 0.d0
+!!            apdq_cart(m,i) = 0.d0
+!!            do  mws = 1,mwaves
+!!                amdq_cart(m,i) = amdq_cart(m,i) + min(s(mws,i),0.d0)*wave(m,mws)
+!!                apdq_cart(m,i) = apdq_cart(m,i) + max(s(mws,i),0.d0)*wave(m,mws)
+!!            enddo
+!!        enddo
 
         if (debug) then
             write(6,211) 1, i, (ql_cart(j,i),j=1,5)
