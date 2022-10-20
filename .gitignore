@@ -643,3 +643,5 @@ applications/clawpack/acoustics/2d/radial/fclaw_options.ini.used
 applications/clawpack/acoustics/2d/interface/fclaw_options.ini.used
 applications/clawpack/euler/3d/.DS_Store
 applications/clawpack/euler/3d/rp/.DS_Store
+zlib/build/CMakeFiles/zlib.dir/compiler_depend.internal
+zlib/build/CMakeFiles/zlibstatic.dir/compiler_depend.internal
