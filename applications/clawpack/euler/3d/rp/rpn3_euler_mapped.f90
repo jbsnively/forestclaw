@@ -1,5 +1,5 @@
 subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,& 
-    ql_cart,qr_cart, auxl,auxr,wave_cart,s,amdq_cart,apdq_cart)
+    ql_cart,qr_cart, auxl,auxr,fwave_cart,s,amdq_cart,apdq_cart)
 !!
 !!     # Roe-solver for the Euler equations
 !!      -----------------------------------------------------------
@@ -26,20 +26,20 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 
     !! Riemann solvers all use (meqn,i,j,k) indexing (5.x indexing)
     integer ixyz, maxm, meqn, mwaves, mbc, mx, maux
-    double precision wave_cart(meqn,mwaves,1-mbc:maxm+mbc)
-    double precision         s(mwaves,1-mbc:maxm+mbc)
-    double precision   ql_cart(meqn,1-mbc:maxm+mbc)
-    double precision   qr_cart(meqn,1-mbc:maxm+mbc)
-    double precision amdq_cart(meqn,1-mbc:maxm+mbc)
-    double precision apdq_cart(meqn,1-mbc:maxm+mbc)
-    double precision      auxl(maux,1-mbc:maxm+mbc)
-    double precision      auxr(maux,1-mbc:maxm+mbc)
+    double precision fwave_cart(meqn,mwaves,1-mbc:maxm+mbc)
+    double precision          s(mwaves,1-mbc:maxm+mbc)
+    double precision    ql_cart(meqn,1-mbc:maxm+mbc)
+    double precision    qr_cart(meqn,1-mbc:maxm+mbc)
+    double precision  amdq_cart(meqn,1-mbc:maxm+mbc)
+    double precision  apdq_cart(meqn,1-mbc:maxm+mbc)
+    double precision       auxl(maux,1-mbc:maxm+mbc)
+    double precision       auxr(maux,1-mbc:maxm+mbc)
 
     double precision dtcom, dxcom, dycom, dzcom, tcom
     integer icom, jcom, kcom
     common /comxyzt/ dtcom,dxcom,dycom,dzcom,tcom,icom,jcom,kcom
 
-    double precision ql(5),qr(5), s_rot(3), wave(5,3)
+    double precision ql(5),qr(5), s_rot(3), fwave(5,3)
     double precision amdq(5), apdq(5), rot(9), uvw(3)
 
 
@@ -48,7 +48,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
     double precision delta(5)
     logical efix
     integer i, j, ii, m, info, mws, locrot, locarea
-    double precision pr, pl, enth, rhsq2, rhsqrtl, rhsqrtr
+    double precision pr, pl, enth, rhsq2, rhsqrtl, rhsqrtr, ur, ul
     double precision rho_im1, pim1, cim1, s0
     double precision rho1, rhou1, rhov1, rhow1, en1, p1, c1
     double precision s1, sfract, rhoi, pi, ci, s3
@@ -57,7 +57,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 
     logical debug
 
-    data efix /.true./    !# use entropy fix for transonic rarefactions
+    data efix /.false./    !# use entropy fix for transonic rarefactions
 
     debug = .false.
     if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
@@ -113,17 +113,26 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
         do j = 1,3
             uvw(j) = (qr(j+1)/rhsqrtl + ql(j+1)/rhsqrtr) / rhsq2
         enddo
+
         call rotate3(rot,uvw)
 
-        do j = 1,meqn
-            delta(j) = ql(j) - qr(j)
-        enddo
-        call rotate3(rot,delta(2))
+        call rotate3(rot,ql(2))
+        call rotate3(rot,qr(2))
+
+
+        !! # Calculate flux differences (f-wave method)
+        ur = ql(2)/ql(1)
+        ul = qr(2)/qr(1)
+        delta(1) = ql(2) - qr(2)
+        delta(2) = (ql(2)*ur + pr) - (qr(2)*ul + pl)
+        delta(3) = ur*ql(3) - ul*qr(3)
+        delta(4) = ur*ql(4) - ul*qr(4)
+        delta(5) = (ql(5)+pr)*ur - (qr(5)+pl)*ul   
 
         !! --------------- Use rotated values in Riemann solve ------------
 
         !! # Solve normal Riemann problem
-        call solve_riemann(uvw, enth, delta, wave,s_rot,info)
+        call solve_riemann(uvw, enth, delta, fwave,s_rot,info)
 
         if (info > 0) then
             write(6,'(A)') 'In rpn3'
@@ -173,11 +182,11 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
                 amdq = 0.d0
                 !! right_going = .true.
             else
-                rho1 = qr(1) + wave(1,1)
-                rhou1 = qr(2) + wave(2,1)
-                rhov1 = qr(3) + wave(3,1)
-                rhow1 = qr(4) + wave(4,1)
-                en1 = qr(5) + wave(5,1)
+                rho1 = qr(1) + fwave(1,1)/s_rot(1)
+                rhou1 = qr(2) + fwave(2,1)/s_rot(1)
+                rhov1 = qr(3) + fwave(3,1)/s_rot(1)
+                rhow1 = qr(4) + fwave(4,1)/s_rot(1)
+                en1 = qr(5) + fwave(5,1)/s_rot(1)
                 uvw2 = rhou1**2 + rhov1**2 + rhow1**2
                 p1 = gamma1*(en1 - 0.5d0*uvw2/rho1)
                 c1 = sqrt(gamma*p1/rho1)
@@ -198,7 +207,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
                     sfract = 0.d0         
                 endif
                 do m = 1,meqn
-                    amdq(m) = sfract*wave(m,1)
+                    amdq(m) = sfract*fwave(m,1)/s_rot(1)
                 end do
             endif
 
@@ -211,7 +220,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             endif
 
             do m=1,meqn
-                amdq(m) = amdq(m) + s_rot(2)*wave(m,2)
+                amdq(m) = amdq(m) + fwave(m,2)
             enddo
 
            !! # check 3-wave:
@@ -225,11 +234,11 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             !! # u+c in right state  (cell i)
             s3 = ql(2)/rhoi + ci     
 
-            rho2 = ql(1) - wave(1,3)
-            rhou2 = ql(2) - wave(2,3)
-            rhov2 = ql(3) - wave(3,3)
-            rhow2 = ql(4) - wave(4,3)
-            en2 = ql(5) - wave(5,3)
+            rho2 = ql(1) - fwave(1,3)/s_rot(3)
+            rhou2 = ql(2) - fwave(2,3)/s_rot(3)
+            rhov2 = ql(3) - fwave(3,3)/s_rot(3)
+            rhow2 = ql(4) - fwave(4,3)/s_rot(3)
+            en2 = ql(5) - fwave(5,3)/s_rot(3)
 
             uvw2 = rhou2**2 + rhov2**2 + rhow2**2
             p2 = gamma1*(en2 - 0.5d0*(uvw2)/rho2)
@@ -247,7 +256,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             endif
 
             do m = 1,5
-                amdq(m) = amdq(m) + sfract*wave(m,3)
+                amdq(m) = amdq(m) + sfract*fwave(m,3)/s_rot(3)
             enddo
 
   200       continue
@@ -259,7 +268,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             do m = 1,meqn
                df = 0.d0
                do mws = 1,mwaves
-                    df = df + s_rot(mws)*wave(m,mws)
+                    df = df + fwave(m,mws)
                enddo
                apdq(m) = df - amdq(m)
             enddo
@@ -270,20 +279,23 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
                 amdq(m) = 0.d0
                 apdq(m) = 0.d0
                 do  mws = 1,mwaves
-                    amdq(m) = amdq(m) + min(s_rot(mws),0.d0)*wave(m,mws)
-                    apdq(m) = apdq(m) + max(s_rot(mws),0.d0)*wave(m,mws)
-                end do
-            end do
+                    if (s_rot(mws).LT.0.d0) then
+                        amdq(m) = amdq(m) + fwave(m,mws)
+                    else     
+                        apdq(m) = apdq(m) + fwave(m,mws)
+                    endif
+                enddo
+            enddo
         endif  !! end of entropy fix
 
+        area = auxl(locarea,i)
         do mws = 1,mwaves
-            call rotate3_tr(rot,wave(2,mws))
+            call rotate3_tr(rot,fwave(2,mws))
             do m = 1,meqn
-                wave_cart(m,mws,i) = wave(m,mws)
+                fwave_cart(m,mws,i) = area*fwave(m,mws)
             enddo 
         enddo
 
-        area = auxl(locarea,i)
         do mws = 1,mwaves
             s(mws,i) = area*s_rot(mws)
         enddo
@@ -295,15 +307,6 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             amdq_cart(m,i) = area*amdq(m)
         end do
 
-
-!!        do m=1,meqn
-!!            amdq_cart(m,i) = 0.d0
-!!            apdq_cart(m,i) = 0.d0
-!!            do  mws = 1,mwaves
-!!                amdq_cart(m,i) = amdq_cart(m,i) + min(s(mws,i),0.d0)*wave(m,mws)
-!!                apdq_cart(m,i) = apdq_cart(m,i) + max(s(mws,i),0.d0)*wave(m,mws)
-!!            enddo
-!!        enddo
 
         if (debug) then
             write(6,211) 1, i, (ql_cart(j,i),j=1,5)
