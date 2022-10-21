@@ -80,7 +80,7 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
     debugm = .false.
     debugp = .false.
     if (icoor .eq. 2) then
-        if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
+        if (ixyz .eq. 1 .and. jcom .eq. 1 .and. kcom .eq. 4) then
             if (ilr .eq. 1) then
                 debugm = .true.
                 debugp = .false.
@@ -89,6 +89,24 @@ subroutine clawpack46_rpt3_mapped(ixyz,icoor,ilr,maxm,meqn,mwaves,maux,mbc, &
     endif
     debugm = .false.
     debugp = .false.
+
+
+
+!!    IF(ixyz == 1)THEN
+!!       mu = 2
+!!       mv = 3
+!!       mw = 4
+!!    ELSE IF(ixyz == 2)THEN
+!!       mu = 3
+!!       mv = 4
+!!       mw = 2
+!!    ELSE
+!!       mu = 4
+!!       mv = 2
+!!       mw = 3
+!!    ENDIF
+
+
 
     !! # This just tells us where to find the particular rotation vectors
     !! # not in which array they are (aux1, aux2, aux3).  That we do below.

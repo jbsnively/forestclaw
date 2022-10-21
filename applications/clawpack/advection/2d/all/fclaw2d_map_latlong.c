@@ -127,8 +127,3 @@ fclaw2d_map_context_t *
 
     return cont;
 }
-
-
-#ifdef __cplusplus
-}
-#endif
