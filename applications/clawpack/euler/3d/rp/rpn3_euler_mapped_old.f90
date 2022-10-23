@@ -24,9 +24,6 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
     use setprob_mod, only : gamma, gamma1, mcapa
     implicit none
 
-    double precision, external :: suppow
-    double precision, external :: cflsupbee
-
     !! Riemann solvers all use (meqn,i,j,k) indexing (5.x indexing)
     integer ixyz, maxm, meqn, mwaves, mbc, mx, maux
     double precision fwave_cart(meqn,mwaves,1-mbc:maxm+mbc)
@@ -43,46 +40,30 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
     common /comxyzt/ dtcom,dxcom,dycom,dzcom,tcom,icom,jcom,kcom
 
     double precision ql(5),qr(5), s_rot(3), fwave(5,3)
-    double precision amdq(5), apdq(5), rot(9)
+    double precision amdq(5), apdq(5), rot(9), uvw(3)
 
-    !! Roe data
-    double precision   u2v2w2, uvw2, u,v,w   ! uvw2 is square of flow, u2v2w2 is square of roe
-    double precision    uvw(3,1-mbc:maxm+mbc)
-    double precision   enth(  1-mbc:maxm+mbc)
 
-    !! Beta and delta storage for limiting scheme
-    double precision      b(5,1-mbc:maxm+mbc)
-    double precision    bId(5)
-    double precision  delta(5,1-mbc:maxm+mbc)
+    !!  local arrays -- common block comroe is passed to rpt3eu
 
-    !! Data for CFL-dependent limiting scheme
-    double precision  dtdx1d( 1-mbc:maxm+mbc), dx
-    integer              Id(3,1-mbc:maxm+mbc)
-    double precision    CFL(3,1-mbc:maxm+mbc), CFLup
-    double precision   wlim, wlimEu(5)
-
+    double precision delta(5)
+    logical efix
     integer i, j, ii, m, info, mws, locrot, locarea
-    double precision a2, a, g1a2, euv
-    double precision pr, pl, rhsq2, rhsqrtl, rhsqrtr, ur, ul
+    double precision pr, pl, enth, rhsq2, rhsqrtl, rhsqrtr, ur, ul
     double precision rho_im1, pim1, cim1, s0
     double precision rho1, rhou1, rhov1, rhow1, en1, p1, c1
     double precision s1, sfract, rhoi, pi, ci, s3
     double precision rho2, rhou2, rhov2, rhow2, en2, p2, c2
-    double precision s2, df, area
+    double precision s2, df, area, uvw2
 
-    double precision theta, beta
-
-    logical efix, nonlocal
+    logical debug
 
     data efix /.false./    !# use entropy fix for transonic rarefactions
 
-    data nonlocal /.false./ !# use nonlocal correction for CFL, maybe not helpful
-
-    !! CFL Superbee beta-theta limiter
-    !! (Theta = 1, Beta = 2/3 Recommended)
-    theta = 1.0d0
-    beta  = 0.666666666666666d0
-
+    debug = .false.
+    if (ixyz .eq. 1 .and. jcom .eq. 4 .and. kcom .eq. 4) then
+        debug = .true.
+    endif
+    debug = .false.
 
     if (mwaves .ne. 3) then
         write(6,*) '*** Should have mwaves=3 for this Riemann solver'
@@ -119,9 +100,9 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
         pl = gamma1*(qr(5) - 0.5d0*uvw2/qr(1))
 
         uvw2 = ql(2)**2 + ql(3)**2 + ql(4)**2
-        pr = gamma1*(ql(5) - 0.5d0*uvw2/ql(1))
+        pr = gamma1*(ql(5) - 0.5d0*(uvw2)/ql(1))
 
-        enth(i) = (((qr(5)+pl)/rhsqrtl + (ql(5)+pr)/rhsqrtr)) / rhsq2
+        enth = (((qr(5)+pl)/rhsqrtl + (ql(5)+pr)/rhsqrtr)) / rhsq2
 
 
         !! --------------- Use rotated values in Riemann solve ------------
@@ -130,34 +111,29 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
         enddo
 
         do j = 1,3
-            uvw(j,i) = (qr(j+1)/rhsqrtl + ql(j+1)/rhsqrtr) / rhsq2
+            uvw(j) = (qr(j+1)/rhsqrtl + ql(j+1)/rhsqrtr) / rhsq2
         enddo
 
-        call rotate3(rot,uvw(:,i))
+        call rotate3(rot,uvw)
 
         call rotate3(rot,ql(2))
         call rotate3(rot,qr(2))
 
-        dx = dxcom*merge(1.d0,0.d0,(ixyz.EQ.1)) + &
-             dycom*merge(1.d0,0.d0,(ixyz.EQ.2)) + &
-             dzcom*merge(1.d0,0.d0,(ixyz.EQ.3))
-        dtdx1d(i) = (dtcom/dx)/auxl(locarea,i)
 
         !! # Calculate flux differences (f-wave method)
         ur = ql(2)/ql(1)
         ul = qr(2)/qr(1)
-        delta(1,i) = ql(2) - qr(2)
-        delta(2,i) = (ql(2)*ur + pr) - (qr(2)*ul + pl)
-        delta(3,i) = ur*ql(3) - ul*qr(3)
-        delta(4,i) = ur*ql(4) - ul*qr(4)
-        delta(5,i) = (ql(5)+pr)*ur - (qr(5)+pl)*ul   
+        delta(1) = ql(2) - qr(2)
+        delta(2) = (ql(2)*ur + pr) - (qr(2)*ul + pl)
+        delta(3) = ur*ql(3) - ul*qr(3)
+        delta(4) = ur*ql(4) - ul*qr(4)
+        delta(5) = (ql(5)+pr)*ur - (qr(5)+pl)*ul   
 
         !! --------------- Use rotated values in Riemann solve ------------
 
         !! # Solve normal Riemann problem
-        call solve_riemann(gamma1, uvw(:,i), enth(i), delta(:,i), fwave, s_rot, info)
+        call solve_riemann(uvw, enth, delta, fwave,s_rot,info)
 
-        !! @ Output error diagnostics
         if (info > 0) then
             write(6,'(A)') 'In rpn3'
             write(6,1001) 'rhol = ',qr_cart(1,i-1)
@@ -184,16 +160,6 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             stop
         endif
 1001    format(A,2E16.8)
-
-        !! # Store betas from the waves
-        b(1,i) = fwave(1,1)
-        b(4,i) = fwave(1,2)
-        b(2,i) = fwave(3,2)-b(4,i)*uvw(2,i)
-        b(3,i) = fwave(4,2)-b(4,i)*uvw(3,i)
-        b(5,i) = fwave(1,3)
-
-
-        !! # Entropy Fix
 
         if (efix) then
 
@@ -322,162 +288,48 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             enddo
         endif  !! end of entropy fix
 
-        !! # Store apdq and amdq
-
         area = auxl(locarea,i)
+        do mws = 1,mwaves
+            call rotate3_tr(rot,fwave(2,mws))
+            do m = 1,meqn
+                fwave_cart(m,mws,i) = area*fwave(m,mws)
+            enddo 
+        enddo
+
+        do mws = 1,mwaves
+            s(mws,i) = area*s_rot(mws)
+        enddo
+
         call rotate3_tr(rot,apdq(2))
         call rotate3_tr(rot,amdq(2))
         do m = 1,meqn
             apdq_cart(m,i) = area*apdq(m)
             amdq_cart(m,i) = area*amdq(m)
         end do
-        do mws = 1,mwaves
-            s(mws,i) = area*s_rot(mws)
-        enddo
+
+
+        if (debug) then
+            write(6,211) 1, i, (ql_cart(j,i),j=1,5)
+            !!write(6,211) i, (qr_cart(j,i),j=1,5)
+            !!write(6,211) i, (delta(j),j=1,5)
+            !!write(6,211) i, (amdq_cart(j,i)/area,j=1,5)
+            !!write(6,211) i, (apdq_cart(j,i)/area,j=1,5)
+            !!write(6,*) ' '
+        endif
+211 format(2I5,5E16.8)
 
     enddo  !! end of i loop over 1d sweep array
-
- 
-
-    !! # Limiting loops
-
-    do i = 0, mx+1
-
-        !! # Calculate upwind direction and local CFL
-        do mws = 1, 3
-            Id(mws,i)  = int(i-dsign(1.d0,s(mws,i)))
-            CFL(mws,i) = dabs(s(mws,i)*dtdx1d(max(i,Id(mws,i))))
-        enddo
-    enddo !! end calculation
-
-    
-    wlimEu(:)=0.d0    
-    do i = 1, mx+1 
-        u = uvw(1,i)
-        v = uvw(2,i)
-        w = uvw(3,i)
-
-        u2v2w2 = u**2 + v**2 + w**2
-        a2 = gamma1*(enth(i) - 0.5d0*u2v2w2)
-        a = sqrt(a2)
-        g1a2 = gamma1 / a2
-        euv = enth(i) - u2v2w2
-        
-     !! # Acoustic Wave 1
-        if (b(1,i).NE.0.d0) then
-            bId(4) = g1a2 * (euv*delta(1,Id(1,i))               &
-                   + u*delta(2,Id(1,i)) + v*delta(3,Id(1,i))    &
-                   + w*delta(4,Id(1,i)) - delta(5,Id(1,i)))
-            bId(5) = (delta(2,Id(1,i)) + (a-u)*delta(1,Id(1,i)) &
-                   - a*bId(4)) / (2.d0*a)
-            bId(1) = delta(1,Id(1,i)) - bId(4) - bId(5)
-            if (nonlocal) then
-                CFLup=CFL(1,Id(1,i))
-            else
-                CFLup=CFL(1,i)
-            endif
-            wlimEu(1) = suppow(bId(1)/b(1,i),CFL(1,i),CFLup)
-        endif
-
-     !! # Shear Wave 2
-        if (b(2,i).NE.0.d0) then
-            bId(2) = delta(3,Id(2,i)) - v*delta(1,Id(2,i))
-            if (nonlocal) then
-                CFLup=CFL(2,Id(2,i))
-            else
-                CFLup=CFL(2,i)
-            endif
-            wlimEu(2) = cflsupbee(theta,beta,bId(2)/b(2,i),CFL(2,i),CFLup)
-        endif
-
-     !! # Shear Wave 3
-        if (b(3,i).NE.0.d0) then
-            bId(3) = delta(4,Id(2,i)) - w*delta(1,Id(2,i))
-            if (nonlocal) then
-                CFLup=CFL(2,Id(2,i))
-            else
-                CFLup=CFL(2,i)
-            endif
-            wlimEu(3) = cflsupbee(theta,beta,bId(3)/b(3,i),CFL(2,i),CFLup)
-        endif
-
-     !! # Entroppy Wave 4
-        if (b(4,i).NE.0.d0) then
-            bId(4) = g1a2 * (euv*delta(1,Id(2,i))             &
-                + u*delta(2,Id(2,i)) + v*delta(3,Id(2,i))     &
-                + w*delta(4,Id(2,i)) - delta(5,Id(2,i)))
-            if (nonlocal) then
-                CFLup=CFL(2,Id(2,i))
-            else
-                CFLup=CFL(2,i)
-            endif
-            wlimEu(4) = cflsupbee(theta,beta,bId(4)/b(4,i),CFL(2,i),CFLup)
-        endif
-
-     !! # Acoustic Wave 5
-        if (b(5,i).NE.0.d0) then
-            bId(4) = g1a2 * (euv*delta(1,Id(3,i))             &
-                   + u*delta(2,Id(3,i)) + v*delta(3,Id(3,i))  &
-                   + w*delta(4,Id(3,i)) - delta(5,Id(3,i)))
-            bId(5) = (delta(2,Id(3,i)) + (a-u)*delta(1,Id(3,i))  &
-                   - a*bId(4)) / (2.d0*a)
-            if (nonlocal) then
-                CFLup=CFL(3,Id(3,i))
-            else
-                CFLup=CFL(3,i)
-            endif
-            wlimEu(5) = suppow(bId(5)/b(5,i),CFL(3,i),CFLup)
-        endif
-
-        !! # Apply Limiter
-
-        area = auxl(locarea,i)
-  
-        do m = 1, 5
-            bId(m) = wlimEu(m)*b(m,i)
-        enddo
-
-        fwave(1,1) = bId(1)
-        fwave(2,1) = bId(1)*(u-a)
-        fwave(3,1) = bId(1)*v
-        fwave(4,1) = bId(1)*w
-        fwave(5,1) = bId(1)*(enth(i) - u*a)
-
-        fwave(1,2) = bId(4)
-        fwave(2,2) = bId(4)*u
-        fwave(3,2) = bId(4)*v + bId(2)
-        fwave(4,2) = bId(4)*w + bId(3)
-        fwave(5,2) = bId(4)*0.5d0*u2v2w2  + bId(2)*v + bId(3)*w
-
-        fwave(1,3) = bId(5)
-        fwave(2,3) = bId(5)*(u+a)
-        fwave(3,3) = bId(5)*v
-        fwave(4,3) = bId(5)*w
-        fwave(5,3) = bId(5)*(enth(i)+u*a)
-
-        !! # Return f-waves
-        do mws = 1, 3 
-            call rotate3_tr(rot,fwave(2,mws))
-            do m = 1, 5
-                fwave_cart(m,mws,i) = area*fwave(m,mws)
-            enddo 
-        enddo
-
-
-    enddo !! end of i loop over 1d sweep array for limiting
-
 
     return
 end subroutine clawpack46_rpn3_mapped
 
 
-!! # Riemann Solver
-
-subroutine solve_riemann(gamma1,uvw,enth,delta,wave,s,info)
+subroutine solve_riemann(uvw,enth,delta,wave,s,info)
+    use setprob_mod, only : gamma1
     implicit none
 
     double precision enth, uvw(3), delta(5)
-    double precision wave(5,3), s(3), gamma1
+    double precision wave(5,3), s(3)
     double precision u2v2w2, a2, a, g1a2, euv
     double precision a1, a3, a4, a5,u,v,w
     integer info
@@ -501,7 +353,7 @@ subroutine solve_riemann(gamma1,uvw,enth,delta,wave,s,info)
     g1a2 = gamma1 / a2
     euv = enth - u2v2w2
 
-    a4 = g1a2 * (euv*delta(1) + u*delta(2) + v*delta(3) + w*delta(4) &
+    a4 = g1a2 * (euv*delta(1) + u*delta(2) + v*delta(3) + w*delta(4) & 
                  - delta(5))
     a2 = delta(3) - v*delta(1)
     a3 = delta(4) - w*delta(1)
@@ -535,49 +387,3 @@ subroutine solve_riemann(gamma1,uvw,enth,delta,wave,s,info)
     s(3) = u + a
 
 end subroutine solve_riemann
-
-
-!! ----------------------------------------------------
-!!   Limiter functions for third-order MAGIC Schemes
-!! ----------------------------------------------------
-
-double precision function cflsupbee(theta,beta,r,CFL,CFLup)
-      implicit double precision (a-h,o-z)
-
-      !! # CFL-Superbee Limiter:
-      CFLe = dmax1(0.001d0,dmin1(0.999d0,CFL))
-      CFLupe = dmax1(0.001d0,dmin1(0.999d0,CFLup))
-      weight = (1.d0 - CFLupe) / (1.d0 - CFLe)
-      s1 = theta*weight*2.d0/CFLe
-      s2 = (1.d0 + CFLe) / 3.d0
-      phimax = theta * 2.d0 / (1.d0 - CFLe)
-      ultra = dmax1(0.d0,dmin1(s1*r,phimax))
-      c1 = 1.d0 + (s2 - beta/2.d0) * (r-1.d0)
-      c2 = 1.d0 + (s2 + beta/2.d0) * (r-1.d0)
-      cflsupbee = dmax1(0.d0, dmin1(ultra,dmax1(c1,c2)))
-
-return
-end
-
-
-double precision function suppow(r,CFL,CFLup)
-     implicit double precision (a-h,o-z)
-
-      !! # Superpower Limiter:
-      CFLe = dmax1(0.001d0,dmin1(0.999d0,CFL))
-      CFLupe = dmax1(0.001d0,dmin1(0.999d0,CFLup))
-      s2 = (1.d0 + CFLe) / 3.d0
-      s3 = 1.d0 - s2
-      weight = (1.d0 - CFLupe) / (1.d0 - CFLe)
-      if (r.LE.1.d0) then
-         pp = weight*(2.d0/CFLe)*2.d0*s3
-      else
-         pp = dabs(2.d0/(1.d0-CFLe))*2.d0*s2
-      endif
-      rabs = dabs(r)
-      rfrac = dabs((1.d0-rabs)/(1.d0+rabs))
-      signum = dmax1(0.d0,dsign(1.d0,r))
-      suppow = signum * (s3+s2*r) * (1.d0-rfrac**pp)
-
-return
-end

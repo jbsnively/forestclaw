@@ -159,7 +159,7 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
         enddo
         call rotate3(rot,uvw)
 
-        call solve_riemann(uvw,enth, bsasdq, wave,s_rot,info)
+        call solve_riemann(gamma1,uvw,enth, bsasdq, wave,s_rot,info)
 
         if (info > 0) then
             write(6,*) 'Calling from double transverse solve; C-'
@@ -229,7 +229,7 @@ subroutine clawpack46_rptt3_mapped(ixyz,icoor,ilr,impt,maxm,meqn,mwaves,&
         enddo
         call rotate3(rot,uvw)
 
-        call solve_riemann(uvw,enth,bsasdq, wave,s_rot,info)
+        call solve_riemann(gamma1,uvw,enth,bsasdq, wave,s_rot,info)
 
         if (info > 0) then
             write(6,*) 'Calling from double transverse solve; C+'
