@@ -74,7 +74,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 
     logical efix, nonlocal
 
-    data efix /.true./    !# use entropy fix for transonic rarefactions
+    data efix /.false./    !# use entropy fix for transonic rarefactions
 
     data nonlocal /.false./ !# use nonlocal correction for CFL, maybe not helpful
 
@@ -350,7 +350,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 
     
     wlimEu(:)=0.d0    
-    do i = 0, mx+1 
+    do i = 1, mx+1 
         u = uvw(1,i)
         v = uvw(2,i)
         w = uvw(3,i)
@@ -465,7 +465,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
     enddo !! end of i loop over 1d sweep array for limiting
 
 
-999 return
+return
 end subroutine clawpack46_rpn3_mapped
 
 
