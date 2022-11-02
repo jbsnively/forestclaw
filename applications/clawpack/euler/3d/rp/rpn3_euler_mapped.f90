@@ -74,15 +74,14 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
 
     logical efix, nonlocal
 
-    data efix /.false./    !# use entropy fix for transonic rarefactions
+    data efix /.true./    !# use entropy fix for transonic rarefactions
 
     data nonlocal /.false./ !# use nonlocal correction for CFL, maybe not helpful
 
     !! CFL Superbee beta-theta limiter
     !! (Theta = 1, Beta = 2/3 Recommended)
-    theta = 1.0d0
+    theta = 0.95d0
     beta  = 0.666666666666666d0
-
 
     if (mwaves .ne. 3) then
         write(6,*) '*** Should have mwaves=3 for this Riemann solver'
@@ -334,7 +333,6 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
         do mws = 1,mwaves
             s(mws,i) = area*s_rot(mws)
         enddo
-
     enddo  !! end of i loop over 1d sweep array
 
     !! # Limiting loops
@@ -348,7 +346,6 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
         enddo
     enddo !! end calculation
 
-    
     wlimEu(:)=0.d0    
     do i = 1, mx+1 
         u = uvw(1,i)
@@ -427,8 +424,11 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
             wlimEu(5) = suppow(bId(5)/b(5,i),CFL(3,i),CFLup)
         endif
 
-        !! # Apply Limiter
+        !! # Apply Limiter with rotations
 
+        do j = 1,9
+            rot(j) = auxl(locrot+j-1,i)
+        enddo
         area = auxl(locarea,i)
   
         do m = 1, 5
@@ -465,7 +465,7 @@ subroutine clawpack46_rpn3_mapped(ixyz,maxm,meqn,mwaves,maux,mbc,mx,&
     enddo !! end of i loop over 1d sweep array for limiting
 
 
-return
+999 return
 end subroutine clawpack46_rpn3_mapped
 
 
